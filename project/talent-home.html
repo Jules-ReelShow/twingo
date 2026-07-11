@@ -271,7 +271,7 @@ function App() {
       <FAQ />
       <FinalCTA onJoin={() => setAuthOpen("signup")} />
       <Footer />
-      <AuthModal open={!!authOpen} mode={authOpen || "signup"} onClose={() => setAuthOpen(null)} />
+      <AuthModal open={!!authOpen} mode={authOpen || "signup"} audience="talent" onClose={() => setAuthOpen(null)} />
     </>
   );
 }

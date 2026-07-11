@@ -137,9 +137,10 @@ const AuthApple = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#000" d="M17.05 12.7c-.03-2.7 2.2-4 2.3-4.06-1.25-1.84-3.2-2.09-3.9-2.12-1.66-.17-3.24.97-4.08.97-.84 0-2.14-.95-3.52-.92-1.8.03-3.47 1.05-4.4 2.66-1.88 3.27-.48 8.1 1.35 10.76.9 1.3 1.96 2.76 3.35 2.71 1.35-.05 1.86-.87 3.49-.87 1.62 0 2.08.87 3.5.84 1.44-.02 2.36-1.32 3.24-2.63 1.02-1.5 1.44-2.96 1.46-3.03-.03-.02-2.8-1.08-2.83-4.28ZM14.4 4.74c.74-.9 1.24-2.14 1.1-3.38-1.07.04-2.36.71-3.12 1.6-.68.8-1.28 2.07-1.12 3.29 1.19.09 2.4-.6 3.14-1.5Z"/></svg>
 );
 
-function AuthModal({ open, onClose, mode: initialMode = "signin" }) {
+function AuthModal({ open, onClose, mode: initialMode = "signin", audience }) {
   const [mode, setMode] = React.useState(initialMode);
-  const [role] = useRole();
+  const [persistedRole] = useRole();
+  const role = audience || persistedRole;
   React.useEffect(() => { if (open) setMode(initialMode); }, [open, initialMode]);
   React.useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
@@ -308,7 +309,7 @@ function SimpleHeader({ page, role, anchorBase = "talent-home.html" }) {
           </div>
         </div>
       </header>
-      <AuthModal open={!!authOpen} mode={authOpen || "signin"} onClose={() => setAuthOpen(null)} />
+      <AuthModal open={!!authOpen} mode={authOpen || "signin"} audience={role} onClose={() => setAuthOpen(null)} />
     </>
   );
 }
@@ -343,169 +344,6 @@ function ProfileMenu({ dashHref }) {
         <div className="menu__sep"></div>
         <a href="talent-home.html" className="menu__item menu__item--danger" role="menuitem" onClick={() => setSignedIn(false)}>Sign out</a>
       </div>
-    </div>
-  );
-}
-
-function navFor(role) {
-  return role === "buyer" ? [
-    { label: "Browse", href: "browse.html", key: "browse" },
-    { label: "How it works", href: "talent-home.html#how", key: "how" },
-    { label: "Why Twingo", href: "talent-home.html#why", key: "why" },
-    { label: "Dashboard", href: "buyer-dashboard.html", key: "dash" },
-  ] : [
-    { label: "How it works", href: "talent-home.html#how", key: "how" },
-    { label: "Licensing hub", href: "talent-pricing.html", key: "pricing" },
-    { label: "Trust & control", href: "talent-home.html#trust", key: "trust" },
-    { label: "Dashboard", href: "talent-dashboard.html", key: "dash" },
-  ];
-}
-
-function Header({ page }) {
-  const [role, setRoleState] = useRole();
-  const [signedIn] = useSignedIn();
-  const [auth, setAuth] = React.useState(null);   // null | "signin" | "signup"
-  const [menu, setMenu] = React.useState(false);  // avatar dropdown
-  const [drawer, setDrawer] = React.useState(false); // mobile drawer
-  const nav = navFor(role);
-  return (
-    <>
-      <header className="hdr">
-        <div className="wrap hdr__in">
-          <TwingoMark wordmark />
-          <nav className="hdr__nav">
-            {nav.map(n => (
-              <a key={n.key} href={n.href} className={"navlink" + (page === n.key ? " navlink--active" : "")}>{n.label}</a>
-            ))}
-          </nav>
-          <div className="spacer" />
-          <div className="hdr__desk">
-            <BuyerRoleSwitcher role={role} onChange={setRoleState} />
-            {signedIn ? (
-              <UserMenu role={role} open={menu} setOpen={setMenu} onSwitch={setRoleState} />
-            ) : (
-              <>
-                <button className="navlink" style={{ background: "none", border: "none", cursor: "pointer", font: "inherit" }} onClick={() => setAuth("signin")}>Sign in</button>
-                <Button variant="primary" size="sm" onClick={() => setAuth("signup")}>Sign up</Button>
-              </>
-            )}
-          </div>
-          <button className="hdr__burger" aria-label="Menu" onClick={() => setDrawer(true)}>
-            <span></span><span></span><span></span>
-          </button>
-        </div>
-      </header>
-      <MobileDrawer open={drawer} onClose={() => setDrawer(false)} page={page}
-        role={role} onSwitch={setRoleState} signedIn={signedIn}
-        onAuth={(m) => { setDrawer(false); setAuth(m); }} nav={nav} />
-      <AuthModal open={!!auth} mode={auth || "signin"} onClose={() => setAuth(null)} />
-    </>
-  );
-}
-
-function ModePill({ role }) {
-  return (
-    <span className="modepill">
-      <span className="dot" style={{ background: role === "buyer" ? "var(--vermilion)" : "var(--success)" }} />
-      {role === "buyer" ? "Buyer mode" : "Talent mode"}
-    </span>
-  );
-}
-
-function UserMenu({ role, open, setOpen, onSwitch }) {
-  const ref = React.useRef(null);
-  React.useEffect(() => {
-    if (!open) return;
-    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
-    document.addEventListener("mousedown", onDoc);
-    window.addEventListener("keydown", onKey);
-    return () => { document.removeEventListener("mousedown", onDoc); window.removeEventListener("keydown", onKey); };
-  }, [open]);
-  const other = role === "buyer" ? "talent" : "buyer";
-  const items = role === "buyer"
-    ? [{ l: "Buyer dashboard", h: "buyer-dashboard.html" }, { l: "Browse twins", h: "browse-twins.html" }]
-    : [{ l: "Talent dashboard", h: "talent-dashboard.html" }, { l: "My public profile", h: "profile-talent.html?id=mara" }, { l: "Set your pricing", h: "talent-pricing.html" }];
-  return (
-    <div className="usermenu" ref={ref}>
-      <button className={"usermenu__btn" + (open ? " usermenu__btn--on" : "")} onClick={() => setOpen(!open)} aria-haspopup="true" aria-expanded={open}>
-        <img src={MOCK_USER.photo} alt="" className="usermenu__ava" />
-        <span className="usermenu__caret" style={{ transform: open ? "rotate(180deg)" : "none" }}>▾</span>
-      </button>
-      <div className={"menu" + (open ? " menu--on" : "")} role="menu">
-        <div className="menu__head">
-          <img src={MOCK_USER.photo} alt="" className="menu__ava" />
-          <div style={{ minWidth: 0 }}>
-            <div className="menu__name">{MOCK_USER.name}</div>
-            <div className="menu__email">{MOCK_USER.email}</div>
-          </div>
-        </div>
-        <div className="menu__mode">
-          <ModePill role={role} />
-          <button className="menu__switch" onClick={() => { onSwitch(other); setOpen(false); }}>Switch to {other}</button>
-        </div>
-        <div className="menu__sep"></div>
-        {items.map(it => <a key={it.l} href={it.h} className="menu__item" role="menuitem">{it.l}</a>)}
-        <a href="#" className="menu__item" role="menuitem" onClick={(e) => e.preventDefault()}>Account settings</a>
-        <div className="menu__sep"></div>
-        <a href="talent-home.html" className="menu__item menu__item--danger" role="menuitem"
-           onClick={() => setSignedIn(false)}>Sign out</a>
-      </div>
-    </div>
-  );
-}
-
-function MobileDrawer({ open, onClose, page, role, onSwitch, signedIn, onAuth, nav }) {
-  React.useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-  return (
-    <div className={"drawer" + (open ? " drawer--on" : "")} onClick={onClose}>
-      <aside className="drawer__panel" onClick={(e) => e.stopPropagation()}>
-        <div className="drawer__top">
-          <TwingoMark wordmark />
-          <button className="auth__x" style={{ position: "static" }} onClick={onClose} aria-label="Close">×</button>
-        </div>
-        {signedIn && (
-          <div className="drawer__user">
-            <img src={MOCK_USER.photo} alt="" className="menu__ava" />
-            <div style={{ minWidth: 0 }}>
-              <div className="menu__name">{MOCK_USER.name}</div>
-              <div className="menu__email">{MOCK_USER.email}</div>
-            </div>
-          </div>
-        )}
-        <div className="drawer__mode">
-          <ModePill role={role} />
-          <button className="menu__switch" onClick={() => onSwitch(role === "buyer" ? "talent" : "buyer")}>Switch</button>
-        </div>
-        <nav className="drawer__nav">
-          {nav.map(n => (
-            <a key={n.key} href={n.href} className={"drawer__link" + (page === n.key ? " drawer__link--active" : "")}>{n.label}</a>
-          ))}
-        </nav>
-        <div className="drawer__foot">
-          {signedIn ? (
-            <a href="talent-home.html" className="menu__item menu__item--danger" onClick={() => setSignedIn(false)} style={{ padding: "12px 4px" }}>Sign out</a>
-          ) : (
-            <div style={{ display: "grid", gap: 10 }}>
-              <Button variant="secondary" onClick={() => onAuth("signin")} style={{ width: "100%", justifyContent: "center", display: "flex" }}>Sign in</Button>
-              <Button variant="primary" onClick={() => onAuth("signup")} style={{ width: "100%", justifyContent: "center", display: "flex" }}>Sign up</Button>
-            </div>
-          )}
-        </div>
-      </aside>
-    </div>
-  );
-}
-
-function BuyerRoleSwitcher({ role, onChange, size }) {
-  return (
-    <div className="seg" role="tablist" aria-label="Choose your role">
-      <button className={"seg__btn" + (role === "buyer" ? " seg__btn--on" : "")} onClick={() => onChange("buyer")}>Buyer</button>
-      <button className={"seg__btn" + (role === "talent" ? " seg__btn--on" : "")} onClick={() => onChange("talent")}>Talent</button>
     </div>
   );
 }
@@ -787,6 +625,6 @@ Object.assign(window, {
   DS, getRole, setRole, useRole, getSignedIn, setSignedIn, useSignedIn, MOCK_USER,
   getAccountType, setAccountType, getTalentOnboarded, setTalentOnboarded,
   getSubmissions, setSubmissions, addSubmission, seedSubmissions, useSubmissions,
-  TwingoMark, Header, SimpleHeader, ThemeToggle, RoleSwitcher, BuyerRoleSwitcher, ModePill, Footer, TrustRow, Portrait,
+  TwingoMark, SimpleHeader, ThemeToggle, RoleSwitcher, Footer, TrustRow, Portrait,
   INFLUENCERS, NICHES, PLATFORMS, InfluencerCard, HandoffModal, MessageModal, AuthModal, CONTENT_IMG,
 });
