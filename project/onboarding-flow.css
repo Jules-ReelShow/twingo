@@ -1,0 +1,89 @@
+/* ═══════════ Twingo — Onboarding flow (steps 3–7) ═══════════ */
+.obf-page { min-height: 100vh; background: var(--bg); padding-bottom: 60px; }
+.obf-topmark { padding: 22px 28px; }
+.obf-wrap { max-width: 900px; margin: 0 auto 6px; padding: 0 24px; }
+
+/* Stepper */
+.obf-stepper { margin-bottom: 6px; }
+.obf-bar { height: 4px; border-radius: 999px; background: var(--surface-muted); overflow: hidden; }
+.obf-bar span { display: block; height: 100%; background: var(--lime); transition: width 0.2s ease; }
+.obf-tabs { display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 6px; margin-top: 14px; width: 100%; }
+.obf-tab { font-size: clamp(7px, 0.85vw, 12.5px); font-weight: 500; color: var(--text-tertiary); white-space: nowrap; flex: 1 1 0; text-align: center; }
+.obf-tab--done { color: var(--text-secondary); }
+.obf-tab--on { color: var(--ink); font-weight: 700; }
+
+/* Stage: quiet Twingo-style backdrop — flat surface tint, no gradient blobs */
+.obf-stage { position: relative; min-height: 60vh; padding: 24px; background: var(--surface-subtle); border-top: 1px solid var(--border); }
+.obf-inner { position: relative; z-index: 1; max-width: 620px; margin: 0 auto; }
+.obf-back { display: inline-block; font-size: 13.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 14px; }
+.obf-back:hover { color: var(--ink); }
+.obf-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow-lg); padding: clamp(24px, 4vw, 40px); }
+
+.obf-h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(28px, 4vw, 34px); letter-spacing: -0.02em; line-height: 1.15; margin: 0 0 20px; color: var(--ink); }
+.obf-h2 { font-family: var(--font-display); font-weight: 700; font-size: 26px; letter-spacing: -0.02em; margin: 0 0 14px; color: var(--ink); }
+.obf-p { font-size: 15px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 14px; }
+.obf-p--strong { font-weight: 700; color: var(--ink); }
+.obf-p--muted { font-size: 13.5px; color: var(--text-tertiary); }
+
+/* Identity verification provider card */
+.obf-provider { background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin-top: 6px; }
+.obf-provider__mark { display: flex; justify-content: center; margin-bottom: 14px; }
+.obf-provider__h { font-family: var(--font-display); font-weight: 700; font-size: 18px; text-align: center; margin: 0 0 8px; color: var(--ink); }
+.obf-provider__p { font-size: 13.5px; color: var(--text-secondary); text-align: center; line-height: 1.55; margin: 0 0 18px; }
+.obf-checklist { display: grid; gap: 0; margin-bottom: 16px; }
+.obf-checklist__row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14.5px; font-weight: 500; color: var(--ink); }
+.obf-checklist__row:last-child { border-bottom: none; }
+.obf-checklist__n { width: 26px; height: 26px; border-radius: 999px; background: var(--surface-muted); display: inline-flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700; flex: none; }
+.obf-fastbox { background: var(--card-bg); border: 1px solid var(--border-strong); border-radius: 14px; padding: 14px 16px; margin-bottom: 4px; }
+.obf-fastbox__row { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.obf-input { width: 100%; box-sizing: border-box; height: 42px; padding: 0 13px; border: 1px solid var(--border-strong); border-radius: 10px; font-family: var(--font-body); font-size: 14px; color: var(--ink); background: var(--card-bg); outline: none; }
+.obf-input:focus { border-color: var(--ink); box-shadow: var(--shadow-sm); }
+.obf-powered { text-align: center; font-size: 11.5px; color: var(--text-tertiary); margin: 14px 0 0; }
+
+/* Toggle switch */
+.obf-toggle { position: relative; display: inline-block; width: 34px; height: 20px; border-radius: 999px; background: var(--border-strong); flex: none; cursor: pointer; transition: background var(--dur-fast); }
+.obf-toggle i { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 999px; background: #fff; box-shadow: var(--shadow-sm); transition: transform var(--dur-fast); display: block; }
+.obf-toggle--on { background: var(--success); }
+.obf-toggle--on i { transform: translateX(14px); }
+.obf-toggle-row { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-secondary); margin: 18px 0 4px; cursor: pointer; }
+
+/* Photo upload grid */
+.obf-photogrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 8px; }
+.obf-photoslot { display: flex; flex-direction: column; gap: 6px; }
+.obf-photoslot__label { font-size: 11.5px; color: var(--text-tertiary); text-align: center; }
+@media (max-width: 560px) { .obf-photogrid { grid-template-columns: repeat(2, 1fr); } }
+
+/* Terms step */
+.obf-field { margin-bottom: 22px; }
+.obf-field__label { display: block; font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+.obf-seg3 { display: inline-flex; padding: 3px; gap: 3px; background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 999px; }
+.obf-seg3__btn { border: none; background: transparent; cursor: pointer; font-family: var(--font-body); font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 999px; color: var(--text-secondary); }
+.obf-seg3__btn--on { background: var(--ink); color: var(--bg); }
+.obf-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.obf-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-strong); border-radius: 999px; padding: 7px 13px; font-size: 13px; font-weight: 500; font-family: var(--font-body); background: var(--card-bg); color: var(--ink); cursor: pointer; }
+.obf-chip--on { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+
+/* Allowed content types grid */
+.obf-typegrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.obf-typecard { display: flex; align-items: center; gap: 12px; border: 1px solid var(--border-strong); border-radius: 14px; padding: 14px 16px; font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; background: var(--card-bg); transition: background var(--dur-fast), border-color var(--dur-fast); }
+.obf-typecard input { position: absolute; opacity: 0; pointer-events: none; }
+.obf-typecard--on { background: color-mix(in oklch, var(--lime) 22%, var(--card-bg)); border-color: var(--lime); }
+.obf-typecard__box { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--border-strong); flex: none; display: inline-flex; align-items: center; justify-content: center; background: var(--card-bg); }
+.obf-typecard__box i { width: 10px; height: 10px; border-radius: 3px; display: none; }
+.obf-typecard--on .obf-typecard__box { border-color: var(--success); background: var(--success); }
+.obf-typecard--on .obf-typecard__box i { display: block; background: none; position: relative; }
+.obf-typecard--on .obf-typecard__box::after { content: ""; position: absolute; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px); }
+@media (max-width: 520px) { .obf-typegrid { grid-template-columns: 1fr; } }
+
+/* Compliance step */
+.obf-compliance { display: grid; gap: 14px; margin: 8px 0 4px; }
+.obf-check { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; line-height: 1.5; color: var(--text-secondary); cursor: pointer; }
+.obf-check input { position: absolute; opacity: 0; pointer-events: none; }
+.obf-check--card { border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; color: var(--ink); }
+.obf-check__box { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--border-strong); flex: none; margin-top: 1px; background: var(--card-bg); position: relative; }
+.obf-check input:checked ~ .obf-check__box { border-color: var(--success); background: var(--success); }
+.obf-check input:checked ~ .obf-check__box::after { content: ""; position: absolute; left: 6px; top: 2px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.obf-input--sign { font-style: italic; }
+.obf-done-check { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 999px; background: var(--lime); color: var(--ink-black); font-size: 26px; }
+
+@media (max-width: 640px) { .obf-card { border-radius: 18px; } }

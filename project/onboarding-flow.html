@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Twingo — Create your digital twin</title>
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/fonts.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/colors.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/typography.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/spacing.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/effects.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/styles.css" />
+<link rel="stylesheet" href="twingo.css" />
+<link rel="stylesheet" href="onboarding-flow.css" />
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<script type="text/babel" src="twingo-shared.jsx"></script>
+<script type="text/babel">
+const { Button } = window.TwingoDesignSystem_122db6;
+const { TwingoMark } = window;
+
+const STEPS = ["Create account", "Verify your email", "Welcome & overview", "Identity verification", "Upload your photos", "Your terms", "Compliance"];
+const FIRST_BUILT_STEP = 1; // step 0 (account) is handled by the sign-up modal elsewhere
+
+/* ---------- Top stepper ---------- */
+function Stepper({ step }) {
+  const pct = Math.round(((step + 1) / STEPS.length) * 100);
+  return (
+    <div className="obf-stepper">
+      <div className="obf-bar"><span style={{ width: pct + "%" }}></span></div>
+      <div className="obf-tabs">
+        {STEPS.map((s, i) => (
+          <span key={s} className={"obf-tab" + (i === step ? " obf-tab--on" : i < step ? " obf-tab--done" : "")}>
+            {i + 1}. {s}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Card shell with blurred brand-color blobs ---------- */
+function ObfShell({ children, back }) {
+  return (
+    <div className="obf-stage">
+      <div className="obf-inner">
+        {back && <a href="#" onClick={(e) => { e.preventDefault(); back(); }} className="obf-back">← {back.label || "Back"}</a>}
+        <div className="obf-card">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Step 2: Verify your email ---------- */
+function StepVerifyEmail({ onNext }) {
+  const [code, setCode] = React.useState("");
+  const [sent, setSent] = React.useState(false);
+  const email = MOCK_USER.email;
+  const canContinue = code.trim().length >= 4;
+  return (
+    <ObfShell>
+      <h1 className="obf-h2">Verify your email</h1>
+      <p className="obf-p">We sent a 6-digit code to <strong style={{ color: "var(--ink)" }}>{email}</strong>. Enter it below to confirm it's you.</p>
+      <input className="obf-input obf-input--sign" style={{ textAlign: "center", letterSpacing: "0.3em", fontSize: 20, marginTop: 4 }} maxLength={6} placeholder="------" value={code} onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, ""))} />
+      <button type="button" className="brief__skip" style={{ marginTop: 12, display: "inline-block" }} onClick={() => setSent(true)}>{sent ? "Code resent ✓" : "Resend code"}</button>
+      <Button variant="primary" disabled={!canContinue} onClick={onNext} style={{ width: "100%", justifyContent: "center", display: "flex", marginTop: 18, background: canContinue ? "var(--lime)" : "var(--surface-muted)", borderColor: canContinue ? "var(--lime)" : "var(--surface-muted)", color: canContinue ? "var(--ink-black)" : "var(--text-tertiary)" }}>Verify &amp; continue</Button>
+    </ObfShell>
+  );
+}
+
+/* ---------- Step 3: Welcome & overview ---------- */
+function StepWelcome({ onNext, onBack }) {
+  return (
+    <ObfShell back={Object.assign(() => onBack(), { label: "Back to verification" })}>
+      <h1 className="obf-h1">Your face. Your rules. Your earnings.</h1>
+      <p className="obf-p">By signing up, you're taking the first step toward creating your digital twin through the Twingo platform.</p>
+      <p className="obf-p">Onboarding includes identity verification, profile setup, uploading reference photos, and selecting your terms and usage preferences.</p>
+      <p className="obf-p">Once approved, your profile becomes visible to subscribed brands. When your twin is selected for a project, you're notified — and every use always follows the terms you set here.</p>
+      <p className="obf-p obf-p--strong">Under-18 profiles never appear publicly on Twingo. Access is restricted to verified production companies and agencies.</p>
+      <p className="obf-p obf-p--muted">Onboarding takes about 10 minutes — you can save progress and continue anytime.</p>
+      <Button variant="primary" onClick={onNext} style={{ width: "100%", justifyContent: "center", display: "flex", marginTop: 8, background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Next</Button>
+    </ObfShell>
+  );
+}
+
+/* ---------- Step 4: Identity verification (3 sub-states) ---------- */
+function StepIdentity({ onNext, onBack }) {
+  const [sub, setSub] = React.useState(0); // 0 intro, 1 consent, 2 provider
+  const [email, setEmail] = React.useState("");
+  if (sub === 0) {
+    return (
+      <ObfShell back={Object.assign(() => onBack(), { label: "Back to overview" })}>
+        <h1 className="obf-h2">Identity verification</h1>
+        <p className="obf-p">To publish your digital twin, we need to verify your identity. You'll be guided through a quick process with your ID and a selfie.</p>
+        <Button variant="primary" onClick={() => setSub(1)} style={{ width: "100%", justifyContent: "center", display: "flex", background: "var(--ink)", color: "#fff" }}>Start identity verification</Button>
+      </ObfShell>
+    );
+  }
+  if (sub === 1) {
+    return (
+      <ObfShell back={Object.assign(() => setSub(0), { label: "Back" })}>
+        <h1 className="obf-h2">Identity verification</h1>
+        <p className="obf-p">To publish your digital twin, we need to verify your identity. You'll be guided through a quick process with your ID and a selfie.</p>
+        <div className="obf-provider">
+          <div className="obf-provider__mark"><TwingoMark size={30} /></div>
+          <h3 className="obf-provider__h">Verification for Twingo</h3>
+          <p className="obf-provider__p">You're about to submit sensitive data to Twingo's verification partner. If you received this link from a suspicious source, close this page and contact us immediately.</p>
+          <Button variant="primary" onClick={() => setSub(2)} style={{ width: "100%", justifyContent: "center", display: "flex", background: "var(--ink)", color: "#fff" }}>Continue</Button>
+        </div>
+      </ObfShell>
+    );
+  }
+  return (
+    <ObfShell back={Object.assign(() => setSub(1), { label: "Back" })}>
+      <h1 className="obf-h2">Identity verification</h1>
+      <p className="obf-p">To publish your digital twin, we need to verify your identity. You'll be guided through a quick process with your ID and a selfie.</p>
+      <div className="obf-provider">
+        <h3 className="obf-provider__h" style={{ marginBottom: 4 }}>Let's get you verified</h3>
+        <p className="obf-provider__p" style={{ marginBottom: 16 }}>Follow the simple steps below</p>
+        <div className="obf-checklist">
+          <div className="obf-checklist__row"><span className="obf-checklist__n">1</span>Provide identity document</div>
+          <div className="obf-checklist__row"><span className="obf-checklist__n">2</span>Perform a liveness check</div>
+        </div>
+        <div className="obf-fastbox">
+          <div className="obf-fastbox__row">
+            <span className="obf-toggle obf-toggle--on"><i></i></span>
+            <span>⚡ Save your verified data for next time</span>
+          </div>
+          <p className="obf-p obf-p--muted" style={{ margin: "6px 0 10px" }}>Securely reuse this verification on future Twingo logins.</p>
+          <input className="obf-input" placeholder="Enter your email to continue" value={email} onChange={(e) => setEmail(e.target.value)} />
+        </div>
+        <Button variant="primary" onClick={onNext} style={{ width: "100%", justifyContent: "center", display: "flex", marginTop: 14, background: "var(--ink)", color: "#fff" }}>Start verification</Button>
+        <p className="obf-powered">Secured by Twingo Trust &amp; Safety</p>
+      </div>
+    </ObfShell>
+  );
+}
+
+/* ---------- Step 5: Upload your photos ---------- */
+function StepPhotos({ onNext, onBack }) {
+  const slots = ["Front-facing, neutral", "Front-facing, smiling", "Left profile", "Right profile", "Full body", "Extra angle"];
+  return (
+    <ObfShell back={Object.assign(() => onBack(), { label: "Back to verification" })}>
+      <h1 className="obf-h2">Upload your photos</h1>
+      <p className="obf-p">These reference photos train your digital twin. Use clear, well-lit, recent photos of yourself — no filters, hats, or sunglasses.</p>
+      <div className="obf-photogrid">
+        {slots.map((label, i) => (
+          <div key={i} className="obf-photoslot">
+            <image-slot id={"obf-photo-" + i} shape="rounded" radius="14" style={{ width: "100%", aspectRatio: "1 / 1" }} placeholder={label}></image-slot>
+            <span className="obf-photoslot__label">{label}</span>
+          </div>
+        ))}
+      </div>
+      <Button variant="primary" onClick={onNext} style={{ width: "100%", justifyContent: "center", display: "flex", marginTop: 22, background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Continue</Button>
+    </ObfShell>
+  );
+}
+
+/* ---------- Step 6: Your terms ---------- */
+function StepTerms({ onNext, onBack }) {
+  const [revocable, setRevocable] = React.useState(true);
+  const [blackout, setBlackout] = React.useState(["Political", "Adult", "Medical claims"]);
+  const [contentTypes, setContentTypes] = React.useState(["Commercials & social ads", "Micro-dramas & series", "Film & TV"]);
+  const cats = ["Political", "Adult", "Gambling", "Medical claims", "Crypto", "Alcohol", "Weapons"];
+  const types = ["Commercials & social ads", "Micro-dramas & series", "Film & TV", "Games & interactive", "Music videos", "Education & explainers"];
+  const toggle = (c) => setBlackout(b => b.includes(c) ? b.filter(x => x !== c) : [...b, c]);
+  const toggleType = (t) => setContentTypes(list => list.includes(t) ? list.filter(x => x !== t) : [...list, t]);
+  return (
+    <ObfShell back={Object.assign(() => onBack(), { label: "Back to photos" })}>
+      <h1 className="obf-h2">Your terms</h1>
+      <p className="obf-p">Decide where your twin can appear. Every booking still comes to you for approval — these settings just filter what reaches you.</p>
+
+      <div className="obf-field">
+        <span className="obf-field__label">Allowed content types</span>
+        <div className="obf-typegrid">
+          {types.map(t => (
+            <label key={t} className={"obf-typecard" + (contentTypes.includes(t) ? " obf-typecard--on" : "")}>
+              <input type="checkbox" checked={contentTypes.includes(t)} onChange={() => toggleType(t)} />
+              <span className="obf-typecard__box"><i></i></span>
+              <span>{t}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="obf-field">
+        <span className="obf-field__label">Blackout categories — never allowed</span>
+        <div className="obf-chips">
+          {cats.map(c => (
+            <button key={c} type="button" className={"obf-chip" + (blackout.includes(c) ? " obf-chip--on" : "")} onClick={() => toggle(c)}>{c}</button>
+          ))}
+        </div>
+      </div>
+
+      <label className="obf-toggle-row">
+        <span className={"obf-toggle" + (revocable ? " obf-toggle--on" : "")} onClick={() => setRevocable(v => !v)}><i></i></span>
+        <span>Allow me to revoke any active license from my dashboard at any time</span>
+      </label>
+
+      <Button variant="primary" onClick={onNext} style={{ width: "100%", justifyContent: "center", display: "flex", marginTop: 22, background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Continue</Button>
+    </ObfShell>
+  );
+}
+
+/* ---------- Step 7: Compliance ---------- */
+function StepCompliance({ onSubmit, onBack }) {
+  const [identity, setIdentity] = React.useState(false);
+  const [hosting, setHosting] = React.useState(false);
+  const [revoke, setRevoke] = React.useState(false);
+  const [biometric, setBiometric] = React.useState(false);
+  const [signature, setSignature] = React.useState("");
+  const canSubmit = identity && hosting && revoke && biometric && signature.trim().length > 2;
+  const checks = [
+    ["I confirm I am the person in the photos and documents provided, and I have the right to license this likeness.", identity, setIdentity],
+    ["I consent to Twingo creating and hosting a digital twin from my reference media, used only under licenses I approve.", hosting, setHosting],
+    ["I understand I can revoke consent at any time — new licenses stop immediately, and existing ones are wound down on a defined SLA.", revoke, setRevoke],
+    ["I agree to the processing of my biometric data as described in the Privacy Policy, stored encrypted and never sold.", biometric, setBiometric],
+  ];
+  return (
+    <ObfShell back={Object.assign(() => onBack(), { label: "Back to terms" })}>
+      <h1 className="obf-h2">Compliance</h1>
+      <p className="obf-p">The legal part — read each statement and confirm. This is what keeps your likeness protected.</p>
+      <div className="obf-compliance">
+        {checks.map(([label, val, set], i) => (
+          <label key={i} className="obf-check obf-check--card">
+            <input type="checkbox" checked={val} onChange={(e) => set(e.target.checked)} />
+            <span className="obf-check__box"><i></i></span>
+            <span>{label}</span>
+          </label>
+        ))}
+      </div>
+      <div className="obf-field" style={{ marginTop: 20, marginBottom: 8 }}>
+        <span className="obf-field__label">Digital signature</span>
+        <p className="obf-p obf-p--muted" style={{ marginTop: -4, marginBottom: 10 }}>Type your full legal name to sign.</p>
+        <input className="obf-input obf-input--sign" value={signature} onChange={(e) => setSignature(e.target.value)} placeholder="Full legal name" />
+      </div>
+      <Button variant="primary" disabled={!canSubmit} onClick={onSubmit} style={{ width: "100%", justifyContent: "center", display: "flex", marginTop: 14, background: canSubmit ? "var(--lime)" : "var(--surface-muted)", borderColor: canSubmit ? "var(--lime)" : "var(--surface-muted)", color: canSubmit ? "var(--ink-black)" : "var(--text-tertiary)" }}>Submit for review</Button>
+    </ObfShell>
+  );
+}
+
+/* ---------- Step 8 (post-flow): Done ---------- */
+function StepDone() {
+  return (
+    <ObfShell>
+      <div style={{ textAlign: "center" }}>
+        <span className="obf-done-check">✓</span>
+        <h1 className="obf-h2" style={{ marginTop: 18 }}>Your profile is under review.</h1>
+        <p className="obf-p">We'll email you within 24 hours once your digital twin is approved and live for licensing.</p>
+        <Button variant="primary" href="talent-dashboard.html" style={{ width: "100%", justifyContent: "center", display: "flex", marginTop: 8, background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Go to your dashboard</Button>
+      </div>
+    </ObfShell>
+  );
+}
+
+function OnboardingFlow() {
+  const [step, setStep] = React.useState(FIRST_BUILT_STEP);
+  const next = () => setStep(s => {
+    const n = Math.min(STEPS.length, s + 1);
+    if (n === STEPS.length) setTalentOnboarded(true);
+    return n;
+  });
+  const back = () => setStep(s => Math.max(FIRST_BUILT_STEP, s - 1));
+
+  return (
+    <div className="obf-page">
+      <div className="obf-topmark"><TwingoMark wordmark /></div>
+      {step <= STEPS.length - 1 && <div className="obf-wrap"><Stepper step={step} /></div>}
+      {step === 1 && <StepVerifyEmail onNext={next} />}
+      {step === 2 && <StepWelcome onNext={next} onBack={back} />}
+      {step === 3 && <StepIdentity onNext={next} onBack={back} />}
+      {step === 4 && <StepPhotos onNext={next} onBack={back} />}
+      {step === 5 && <StepTerms onNext={next} onBack={back} />}
+      {step === 6 && <StepCompliance onSubmit={next} onBack={back} />}
+      {step === 7 && <StepDone />}
+    </div>
+  );
+}
+
+const __el = document.getElementById("root");
+(window.__twRoot = window.__twRoot || ReactDOM.createRoot(__el)).render(<OnboardingFlow />);
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+/* ═══════════════ ShowCrew — Color system ═══════════════
+   A quiet, editorial marketplace palette: white canvas, one near-black
+   navy ink, brand energy confined to small accents (never page-wide fills). */
+:root {
+  /* Canvas */
+  --bg: #FFFFFF;              /* page canvas */
+
+  /* Ink & text */
+  --ink: #1C212B;            /* primary text & dark button fill (near-black navy) */
+  --ink-black: #0D0A0A;      /* deepest — imagery, max contrast */
+  --ink-hover: #2C313D;      /* primary button hover */
+  --text-secondary: #5A5B60; /* muted labels, subtext, wordmark grey */
+  --text-tertiary: #8E8E93;  /* de-emphasized meta */
+
+  /* Surfaces & hairlines */
+  --surface-subtle: #F5F7FA; /* section tint / card fill */
+  --surface-muted: #EDEFF3;  /* avatars, deeper fill */
+  --border: #E7E9EE;         /* hairline dividers & cards */
+  --border-strong: #D4D7DE;  /* inputs, chips, hover borders */
+
+  /* Brand accents — use sparingly */
+  --lime: #B4FF6A;           /* energetic highlight, selection, marker sweep */
+  --vermilion: #FA3B02;      /* signature accent, focus ring, imagery */
+  --vermilion-clay: #D86447; /* softer burnt variant, gradients */
+  --chartreuse: #CDD91C;     /* status / "go" dot */
+  --logo-dot: #CDFF47;       /* the focus dot inside the mark */
+
+  /* Functional */
+  --success: #16A34A;        /* contract signed / confirmations */
+  --badge-paid-bg: #E6F7EC;  /* paid / verified badge fill */
+  --badge-paid-fg: #12894B;  /* paid badge text */
+  --focus-ring: #FA3B02;     /* keyboard focus outline */
+
+  /* Selection */
+  --selection-bg: #B4FF6A;
+  --selection-fg: #0D0A0A;
+}
+
+::selection { background: var(--selection-bg); color: var(--selection-fg); }

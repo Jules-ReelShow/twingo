@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Twingo — Messages</title>
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/fonts.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/colors.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/typography.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/spacing.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/effects.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/styles.css" />
+<link rel="stylesheet" href="twingo.css" />
+<link rel="stylesheet" href="messages.css" />
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<script type="text/babel" src="twingo-shared.jsx"></script>
+<script type="text/babel">
+const { Button } = window.TwingoDesignSystem_122db6;
+
+/* Mock brand contacts for talent-mode inbox (businesses messaging the creator) */
+const BRANDS = [
+  { id: "aurora",  name: "Aurora Skincare", avatarColor: "var(--vermilion)" },
+  { id: "flux",    name: "Flux Games",      avatarColor: "var(--success)" },
+  { id: "verde",   name: "Verde Foods",     avatarColor: "var(--vermilion-clay)" },
+  { id: "pulse",   name: "Pulse Fitness",   avatarColor: "var(--ink)" },
+];
+
+function initials(name) { return name.split(" ").map(w => w[0]).slice(0, 2).join(""); }
+
+function seedThread(otherName, youAreBusiness) {
+  const other = otherName.split(" ")[0];
+  if (youAreBusiness) {
+    return [
+      { from: "me", t: "Hi " + other + ", we'd love to license your AI twin for an upcoming product campaign." },
+      { from: "them", t: "Thanks for reaching out! Happy to hear more — what's the usage scope you're thinking?" },
+      { from: "me", t: "Instagram + TikTok, 3 month campaign, non-exclusive. Budget is flexible." },
+    ];
+  }
+  return [
+    { from: "them", t: "Hi! We'd love to license your AI twin for an upcoming campaign." },
+    { from: "me", t: "Thanks for reaching out — happy to hear more. What's the usage scope?" },
+    { from: "them", t: "Instagram + TikTok, 3 month campaign, non-exclusive. Budget is flexible." },
+  ];
+}
+
+function Messages() {
+  const params = new URLSearchParams(location.search);
+  const asBusiness = params.get("as") === "business";
+  const withId = params.get("with");
+
+  const contacts = asBusiness
+    ? INFLUENCERS.slice(0, 8).map(i => ({ id: i.id, name: i.name, photo: i.photo, sub: i.niche + " · " + i.platform }))
+    : BRANDS.map(b => ({ id: b.id, name: b.name, sub: "Brand", avatarColor: b.avatarColor }));
+
+  const initialId = withId || (contacts[0] && contacts[0].id);
+  const [activeId, setActiveId] = React.useState(initialId);
+  const active = contacts.find(c => c.id === activeId) || contacts[0];
+  const [threads, setThreads] = React.useState({});
+  const [draft, setDraft] = React.useState("");
+  const thread = (active && threads[active.id]) || (active ? seedThread(active.name, asBusiness) : []);
+  const scrollRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [thread, activeId]);
+
+  const send = (e) => {
+    e.preventDefault();
+    if (!draft.trim() || !active) return;
+    setThreads(t => ({ ...t, [active.id]: [...(t[active.id] || seedThread(active.name, asBusiness)), { from: "me", t: draft.trim() }] }));
+    setDraft("");
+  };
+
+  return (
+    <>
+      <SimpleHeader page="messages" role={asBusiness ? "business" : "talent"} />
+      <section className="section" style={{ paddingTop: 28, paddingBottom: 28 }}>
+        <div className="wrap">
+          <p className="eyebrow" style={{ marginBottom: 6 }}>Messages</p>
+          <h1 className="h2" style={{ marginBottom: 4 }}>{asBusiness ? "Your conversations with talent" : "Your conversations with businesses"}</h1>
+        </div>
+      </section>
+      <section className="section" style={{ paddingTop: 0, paddingBottom: 60 }}>
+        <div className="wrap">
+          <div className="msginbox">
+            <aside className="msginbox__list">
+              {contacts.map(c => (
+                <button key={c.id} className={"msginbox__row" + (active && c.id === active.id ? " msginbox__row--on" : "")} onClick={() => setActiveId(c.id)}>
+                  {c.photo ? (
+                    <img src={c.photo} alt="" className="msginbox__ava" />
+                  ) : (
+                    <span className="msginbox__ava msginbox__ava--fallback" style={{ background: c.avatarColor || "var(--ink)" }}>{initials(c.name)}</span>
+                  )}
+                  <span className="msginbox__meta">
+                    <span className="msginbox__name">{c.name}</span>
+                    <span className="msginbox__sub">{c.sub}</span>
+                  </span>
+                </button>
+              ))}
+              {!contacts.length && <p className="muted" style={{ padding: 18, fontSize: 13.5 }}>No conversations yet.</p>}
+            </aside>
+            <div className="msginbox__thread">
+              {active ? (
+                <>
+                  <div className="msginbox__threadhead">
+                    {active.photo ? (
+                      <img src={active.photo} alt="" className="msginbox__ava" />
+                    ) : (
+                      <span className="msginbox__ava msginbox__ava--fallback" style={{ background: active.avatarColor || "var(--ink)" }}>{initials(active.name)}</span>
+                    )}
+                    <div>
+                      <div className="msginbox__name">{active.name}</div>
+                      <div className="msginbox__sub">{active.sub}</div>
+                    </div>
+                  </div>
+                  <div className="msginbox__msgs" ref={scrollRef}>
+                    {thread.map((m, i) => (
+                      <div key={i} className={"msgbubble" + (m.from === "me" ? " msgbubble--me" : "")}>{m.t}</div>
+                    ))}
+                  </div>
+                  <form className="msginbox__composer" onSubmit={send}>
+                    <input className="msg-input" placeholder="Write a message…" value={draft} onChange={(e) => setDraft(e.target.value)} />
+                    <Button variant="primary" type="submit" style={{ background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Send</Button>
+                  </form>
+                </>
+              ) : (
+                <div style={{ padding: 40, textAlign: "center" }}><p className="muted">Select a conversation to start messaging.</p></div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+      <Footer />
+    </>
+  );
+}
+
+const __el = document.getElementById("root");
+(window.__twRoot = window.__twRoot || ReactDOM.createRoot(__el)).render(<Messages />);
+</script>
+</body>
+</html>

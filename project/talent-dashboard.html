@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TwinGo — Talent dashboard</title>
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/fonts.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/colors.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/typography.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/spacing.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/effects.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/styles.css" />
+<link rel="stylesheet" href="twingo.css" />
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<script type="text/babel" src="twingo-shared.jsx"></script>
+<script type="text/babel">
+const { Button, Badge, FilterChip } = window.TwingoDesignSystem_122db6;
+
+const CHIP = {
+  live:   { color: "#7A5A00", background: "#FFF3C4" },
+  ontrack:{ color: "#4B7A1E", background: "#EEF9DC" },
+  muted:  { color: "#6C6E76", background: "#F0F1F4" },
+  danger: { color: "#C23617", background: "#FDF1EE" },
+};
+function Chip({ tone = "muted", children }) {
+  return <span className="dchip" style={CHIP[tone]}>{children}</span>;
+}
+
+function TalentDash() {
+  React.useEffect(() => { setRole("talent"); }, []);
+  const TALENT_ID = "mara";
+
+  const DEFAULT_SUBS = [
+    { id: 1, talentId: TALENT_ID, buyer: "Aperture AI", asset: "Skincare hero — variant 3", description: "Product hero still for our spring skincare launch — twin holding the serum bottle, soft studio lighting, no text overlay.", tier: "Campaign", when: "2h ago", status: "pending" },
+    { id: 2, talentId: TALENT_ID, buyer: "Northwind Studio", asset: "Lifestyle reel 0:15", description: "15-second vertical reel, twin walking through a sunlit apartment for a home goods spot. Non-exclusive, TikTok + Reels only.", tier: "Single use", when: "5h ago", status: "pending" },
+    { id: 3, talentId: TALENT_ID, buyer: "Vellum", asset: "Product still set (4)", description: "Four product stills for an e-commerce listing, neutral background, twin gesturing toward the product.", tier: "Single use", when: "1d ago", status: "pending" },
+  ];
+  const [subs, updateSub] = useSubmissions(DEFAULT_SUBS);
+  const queue = subs.filter(s => s.talentId === TALENT_ID && s.status === "pending");
+  const [licenses, setLicenses] = React.useState([
+    { id: 1, buyer: "Aperture AI", tier: "Campaign", price: 980, uses: 42, live: true },
+    { id: 2, buyer: "Halo Labs", tier: "Monthly", price: 380, uses: 8, live: true },
+    { id: 3, buyer: "Studio Kōan", tier: "Single use", price: 380, uses: 3, live: true },
+  ]);
+
+  const MARA_PHOTO = "https://randomuser.me/api/portraits/women/68.jpg";
+  const [preview, setPreview] = React.useState(null);
+  const decide = (id, approved) => { updateSub(id, { status: approved ? "approved" : "declined" }); setPreview(null); };
+  const revoke = (id) => setLicenses(l => l.map(x => x.id === id ? { ...x, live: false } : x));
+
+  const log = [
+    { t: "Aperture AI published an approved skincare still", c: "var(--success)", w: "3h ago" },
+    { t: "You approved Northwind's reel cut", c: "var(--ink)", w: "6h ago" },
+    { t: "Payout of $1,740 sent to your account", c: "var(--success)", w: "2d ago" },
+    { t: "You revoked Vellum's exclusive request", c: "var(--vermilion)", w: "4d ago" },
+  ];
+
+  return (
+    <>
+      <SimpleHeader page="dash" role="talent" />
+      <div className={"overlay" + (preview ? " overlay--on" : "")} onClick={() => setPreview(null)}>
+        <div className="modal" style={{ maxWidth: 520 }} onClick={e => e.stopPropagation()} role="dialog" aria-modal="true">
+          <p className="eyebrow" style={{ marginBottom: 10 }}>Review before it goes live</p>
+          <h3 className="h3">{preview ? preview.asset : ""}</h3>
+          <div className="meta" style={{ marginTop: 4 }}>{preview ? preview.buyer + " · " + preview.tier + " · submitted " + preview.when : ""}</div>
+          <image-slot id="review-preview" shape="rounded" radius="14" src={MARA_PHOTO}
+            style={{ display: "block", width: "100%", aspectRatio: "4 / 3", borderRadius: "14px", marginTop: 18 }}
+            placeholder="Generated content preview"></image-slot>
+          <p className="muted" style={{ fontSize: 13.5, marginTop: 14 }}>
+            {preview ? preview.description : ""}
+          </p>
+          <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+            <Button variant="lime" style={{ flex: 1, justifyContent: "center", display: "flex" }} onClick={() => preview && decide(preview.id, true)}>Approve & allow</Button>
+            <Button variant="secondary" onClick={() => preview && decide(preview.id, false)}>Decline</Button>
+            <Button variant="secondary" onClick={() => setPreview(null)}>Close</Button>
+          </div>
+        </div>
+      </div>
+
+      <main className="wrap" style={{ paddingTop: 34, paddingBottom: 80 }}>
+        {/* Greeting */}
+        <div className="dash-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
+            <span style={{ width: 52, height: 52, borderRadius: 999, flex: "none", background: "center/cover no-repeat url(" + MARA_PHOTO + ")" }}></span>
+            <div>
+              <h1 className="dash-h1">Good morning, Mara</h1>
+              <p className="dash-sub">Here’s what’s happening with your AI twin.</p>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Button variant="secondary" href="profile-talent.html?id=mara">View public profile</Button>
+          </div>
+        </div>
+
+        <div className="hub-tabs" style={{ marginTop: 22, marginBottom: 6 }}>
+          <button className="hub-tab hub-tab--on">Overview</button>
+          <a className="hub-tab" href="talent-pricing.html?tab=profile">Profile</a>
+          <a className="hub-tab" href="talent-pricing.html?tab=packages">Packages</a>
+          <a className="hub-tab" href="talent-pricing.html?tab=offers">Offers{queue.length > 0 && <span className="hub-tab__badge">{queue.length}</span>}</a>
+          <a className="hub-tab" href="talent-pricing.html?tab=earnings">Earnings</a>
+        </div>
+
+        {/* Stats */}
+        <div className="dstats" style={{ marginTop: 26 }}>
+          <div className="dstat dstat--dark">
+            <div className="dstat__k">Available balance</div>
+            <div className="dstat__n">$4,820</div>
+            <div className="dstat__f">Withdraw
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </div>
+          </div>
+          <div className="dstat">
+            <div className="dstat__k">Awaiting your approval</div>
+            <div className="dstat__n">{queue.length}</div>
+            <div className="dstat__f">Nothing goes live without you</div>
+          </div>
+          <div className="dstat">
+            <div className="dstat__k">Profile views · 30d</div>
+            <div className="dstat__n">812</div>
+            <div className="dstat__f dstat__f--lime">↑ 18% vs last month</div>
+          </div>
+          <div className="dstat">
+            <div className="dstat__k">Rating</div>
+            <div className="dstat__n">★ 4.9</div>
+            <div className="dstat__f">37 reviews</div>
+          </div>
+        </div>
+
+        <div className="dgrid">
+          {/* Left column */}
+          <div className="dcol">
+            {/* Approval queue */}
+            <div className="dpanel">
+              <div className="dpanel__head">
+                <h2 className="dpanel__title">Approval queue</h2>
+                {queue.length > 0 && <Badge tone="live" dot>{queue.length} waiting</Badge>}
+              </div>
+              <div className="dpanel__list">
+                {queue.length === 0 && <div style={{ padding: "18px 0", textAlign: "center" }} className="muted">All caught up — nothing waiting for approval.</div>}
+                {queue.map(a => (
+                  <div key={a.id} className="drow">
+                    <span className="drow__logo" style={{ borderRadius: 14, backgroundImage: "url(" + MARA_PHOTO + ")" }}></span>
+                    <div className="drow__main">
+                      <div className="drow__t">{a.asset}</div>
+                      <div className="drow__m">{a.buyer} · {a.tier} · {a.when}</div>
+                    </div>
+                    <div style={{ display: "flex", gap: 8, flex: "none" }}>
+                      <Button variant="secondary" size="sm" onClick={() => setPreview(a)}>View content</Button>
+                      <Button variant="lime" size="sm" onClick={() => decide(a.id, true)}>Approve</Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Active licenses */}
+            <div className="dpanel">
+              <div className="dpanel__head">
+                <h2 className="dpanel__title">Active licenses</h2>
+                <a className="dpanel__link" href="talent-pricing.html?tab=packages">Manage packages</a>
+              </div>
+              <div className="dpanel__list">
+                {licenses.map(l => (
+                  <div key={l.id} className="drow" style={{ opacity: l.live ? 1 : 0.55 }}>
+                    <span className="drow__logo" style={{ background: "linear-gradient(135deg,#1C212B,#5A5B60)" }}>{l.buyer.split(" ").map(w => w[0]).join("").slice(0,2)}</span>
+                    <div className="drow__main">
+                      <div className="drow__t">{l.buyer}</div>
+                      <div className="drow__m">{l.tier} · {l.uses} approved uses</div>
+                    </div>
+                    <div className="drow__amt">${l.price}</div>
+                    {l.live
+                      ? <Button variant="secondary" size="sm" onClick={() => revoke(l.id)}>Revoke</Button>
+                      : <Chip tone="muted">Revoked</Chip>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right column */}
+          <div className="dcol">
+            {/* Profile strength */}
+            <div className="dpanel">
+              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+                <h2 className="dpanel__title">Profile strength</h2>
+                <span style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 18 }}>85%</span>
+              </div>
+              <div className="dbar"><span style={{ width: "85%" }} /></div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 11, marginTop: 18 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13.5, color: "var(--text-secondary)" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4B7A1E" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ flex: "none" }}><path d="M20 6 9 17l-5-5"/></svg>
+                  <s style={{ color: "var(--text-tertiary)" }}>Identity verified with signed consent</s>
+                </div>
+                <a href="talent-pricing.html?tab=packages" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13.5, color: "var(--ink)", fontWeight: 600 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" strokeWidth="1.9" style={{ flex: "none" }}><circle cx="12" cy="12" r="9"/></svg>Add a third package
+                </a>
+                <a href="profile-talent.html?id=mara" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13.5, color: "var(--ink)", fontWeight: 600 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" strokeWidth="1.9" style={{ flex: "none" }}><circle cx="12" cy="12" r="9"/></svg>Add 2 more sample uses
+                </a>
+              </div>
+            </div>
+
+            {/* Latest review */}
+            <div className="dpanel dpanel--tint">
+              <div className="dstat__k">Latest review</div>
+              <div style={{ fontSize: 15, fontWeight: 700, marginTop: 10 }}>★★★★★ 5.0</div>
+              <p style={{ fontSize: 14, lineHeight: 1.55, color: "var(--ink)", margin: "8px 0 0" }}>“Approved every asset in hours and the likeness was flawless — total pro to work with.”</p>
+              <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 10 }}>Aperture AI · Brand lead</div>
+            </div>
+
+            {/* Controls */}
+            <div className="dpanel">
+              <div className="dstat__k">Your controls</div>
+              <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
+                {[
+                  { t: "Pause new licenses", d: "Stay listed, stop new deals" },
+                  { t: "Edit usage terms", d: "Update tiers & blackout categories" },
+                  { t: "Revoke all & unpublish", d: "Pull your twin entirely", danger: true },
+                ].map((c, i) => (
+                  <button key={i} style={{ textAlign: "left", background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "12px 14px", cursor: "pointer" }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: c.danger ? "var(--vermilion)" : "var(--ink)" }}>{c.t}</div>
+                    <div className="meta">{c.d}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
+const __el=document.getElementById("root"); (window.__twRoot=window.__twRoot||ReactDOM.createRoot(__el)).render(<TalentDash />);
+</script>
+</body>
+</html>

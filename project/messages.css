@@ -1,0 +1,22 @@
+/* ═══ Twingo — Messages inbox ═══ */
+.msginbox { display: grid; grid-template-columns: 300px 1fr; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card-bg); overflow: hidden; min-height: 560px; }
+.msginbox__list { border-right: 1px solid var(--border); overflow-y: auto; max-height: 640px; }
+.msginbox__row { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 14px 16px; border: none; border-bottom: 1px solid var(--border); background: none; cursor: pointer; transition: background var(--dur-fast); }
+.msginbox__row:hover { background: var(--surface-subtle); }
+.msginbox__row--on { background: var(--surface-subtle); }
+.msginbox__ava { width: 40px; height: 40px; border-radius: 999px; object-fit: cover; flex: none; }
+.msginbox__ava--fallback { display: inline-flex; align-items: center; justify-content: center; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 13px; }
+.msginbox__meta { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.msginbox__name { font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msginbox__sub { font-size: 12.5px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.msginbox__thread { display: flex; flex-direction: column; min-width: 0; }
+.msginbox__threadhead { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.msginbox__msgs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; max-height: 460px; }
+.msgbubble { align-self: flex-start; max-width: 70%; background: var(--surface-subtle); color: var(--ink); border-radius: 16px 16px 16px 4px; padding: 10px 14px; font-size: 14.5px; line-height: 1.5; }
+.msgbubble--me { align-self: flex-end; background: var(--ink); color: var(--bg); border-radius: 16px 16px 4px 16px; }
+.msginbox__composer { display: flex; gap: 10px; padding: 14px 16px; border-top: 1px solid var(--border); }
+.msginbox__composer .msg-input { flex: 1; }
+.msg-input { box-sizing: border-box; height: 44px; padding: 0 14px; border: 1px solid var(--border-strong); border-radius: 999px; font-family: var(--font-body); font-size: 14px; color: var(--ink); background: var(--card-bg); outline: none; }
+.msg-input:focus { border-color: var(--ink); box-shadow: var(--shadow-sm); }
+@media (max-width: 720px) { .msginbox { grid-template-columns: 1fr; } .msginbox__list { max-height: 220px; border-right: none; border-bottom: 1px solid var(--border); } }

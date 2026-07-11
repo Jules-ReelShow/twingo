@@ -1,0 +1,76 @@
+/* ============================================================
+   ShowCrew — Color tokens
+   Monochrome canvas (warm-neutral ink ramp) + one electric "Volt" signal.
+   ============================================================ */
+:root {
+  /* --- Neutral ink ramp (subtle warm tint, paper → ink) --- */
+  --paper:      #FFFFFF;   /* pure white */
+  --ink-25:     #FAFAF7;   /* warm paper — default page bg */
+  --ink-50:     #F4F4F0;
+  --ink-100:    #ECECE6;
+  --ink-150:    #E2E2DA;
+  --ink-200:    #D6D6CD;
+  --ink-300:    #BEBEB3;
+  --ink-400:    #99998E;
+  --ink-500:    #76766B;
+  --ink-600:    #565650;
+  --ink-700:    #3A3A36;
+  --ink-800:    #232320;
+  --ink-900:    #161614;
+  --ink-950:    #0B0B0A;   /* near-black — primary ink */
+
+  /* --- Volt signal accent (use SPARINGLY: status, focus, small highlights) --- */
+  --volt:       #CDFF47;   /* electric chartreuse */
+  --volt-bright:#DBFF6E;
+  --volt-deep:  #A6D617;   /* on-light text-safe variant */
+  --volt-ink:   #2A3300;   /* text on volt surfaces */
+
+  /* --- Semantic status (desaturated to fit monochrome canvas) --- */
+  --success:    #2E7D55;
+  --success-bg: #E6F2EC;
+  --warning:    #B7791F;
+  --warning-bg: #F8EFDC;
+  --danger:     #C0392B;
+  --danger-bg:  #F8E7E4;
+  --info:       #2D4A7A;
+  --info-bg:    #E6ECF5;
+
+  /* ===========================================================
+     Semantic aliases — reference these in components, not raw ramp
+     =========================================================== */
+  /* Surfaces */
+  --surface-page:     var(--ink-25);
+  --surface-card:     var(--paper);
+  --surface-sunken:   var(--ink-50);
+  --surface-raised:   var(--paper);
+  --surface-inverse:  var(--ink-950);
+  --surface-hover:    var(--ink-50);
+  --surface-active:   var(--ink-100);
+
+  /* Text */
+  --text-primary:     var(--ink-950);
+  --text-secondary:   var(--ink-600);
+  --text-muted:       var(--ink-400);
+  --text-inverse:     var(--paper);
+  --text-on-volt:     var(--volt-ink);
+  --text-link:        var(--ink-950);
+
+  /* Borders / lines */
+  --border-subtle:    var(--ink-100);
+  --border-default:   var(--ink-150);
+  --border-strong:    var(--ink-300);
+  --border-inverse:   var(--ink-800);
+  --border-focus:     var(--ink-950);
+
+  /* Brand action */
+  --action-primary:        var(--ink-950);
+  --action-primary-hover:  var(--ink-800);
+  --action-primary-text:   var(--paper);
+  --action-signal:         var(--volt);
+  --action-signal-hover:   var(--volt-bright);
+  --action-signal-text:    var(--volt-ink);
+
+  /* Focus ring */
+  --ring:           var(--ink-950);
+  --ring-offset:    var(--paper);
+}

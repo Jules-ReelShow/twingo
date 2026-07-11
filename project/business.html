@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Twingo for Business — License creator likenesses for AI content</title>
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/fonts.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/colors.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/typography.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/spacing.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/effects.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/styles.css" />
+<link rel="stylesheet" href="twingo.css" />
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<script type="text/babel" src="twingo-shared.jsx"></script>
+<script type="text/babel">
+const { Button } = window.TwingoDesignSystem_122db6;
+const { TwingoMark, AuthModal, SimpleHeader } = window;
+
+/* ---------- Hero ---------- */
+function Hero({ onJoin }) {
+  const [signedIn] = useSignedIn();
+  return (
+    <section className="section" style={{ paddingTop: 64, paddingBottom: 64 }}>
+      <div className="wrap" style={{ display: "grid", gridTemplateColumns: "1.05fr 1fr", gap: 56, alignItems: "center" }}>
+        <div>
+          <p className="eyebrow" style={{ marginBottom: 18 }}>The likeness marketplace for AI content</p>
+          <h1 className="display" style={{ maxWidth: 580 }}>
+            License creator likenesses for <span className="mark">AI-powered content</span>.
+          </h1>
+          <p className="body-lg" style={{ marginTop: 22, maxWidth: 460 }}>
+            Cast verified creators in commercials, micro-dramas, games and branded stories — with clear approval and usage rights from day one.
+          </p>
+          <div style={{ display: "flex", gap: 12, marginTop: 30, flexWrap: "wrap" }}>
+            {!signedIn && <Button variant="primary" onClick={onJoin} style={{ background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Join</Button>}
+            <Button variant="secondary" href="browse-twins.html" style={{ background: "var(--btn-secondary-bg)", color: "var(--ink)" }}>Browse twins</Button>
+          </div>
+          <div style={{ marginTop: 32 }}><TrustRow /></div>
+        </div>
+        <div className="hero-ba hero-ba--stack">
+          <div className="hero-ba__twincol">
+            <span className="hero-ba__caption">TALENT</span>
+            <figure className="hero-ba__card" style={{ flex: 1 }}>
+              <image-slot id="biz-hero-you" shape="rounded" radius="18" style={{ width: "100%", height: "100%" }} placeholder="Drop a portrait"></image-slot>
+            </figure>
+          </div>
+          <div className="hero-ba__mid">
+            <span className="hero-ba__mid-arrow">→</span>
+          </div>
+          <div className="hero-ba__twincol">
+            <span className="hero-ba__caption hero-ba__caption--after">YOUR CONTENT</span>
+            <div className="hero-ba__twinstack">
+              <figure className="hero-ba__card" style={{ position: "relative" }}>
+                <image-slot id="biz-hero-twin" shape="rounded" radius="18" style={{ width: "100%", aspectRatio: "4 / 5" }} placeholder="Drop a portrait"></image-slot>
+                <span className="hero-ba__tag">Sci-fi</span>
+              </figure>
+              <figure className="hero-ba__card" style={{ position: "relative" }}>
+                <image-slot id="biz-hero-twin-2" shape="rounded" radius="18" style={{ width: "100%", aspectRatio: "4 / 5" }} placeholder="Drop a portrait"></image-slot>
+                <span className="hero-ba__tag">Drama</span>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TrustRow() {
+  const items = [
+    { c: "var(--success)", t: "Creator-approved" },
+    { c: "var(--vermilion)", t: "Business-ready rights" },
+    { c: "var(--chartreuse)", t: "Built for AI production" },
+  ];
+  return (
+    <div className="trust">
+      {items.map((i, k) => (
+        <span key={k} className="trust__item"><span className="dot" style={{ background: i.c }} />{i.t}</span>
+      ))}
+    </div>
+  );
+}
+
+/* ---------- Why businesses use Twingo ---------- */
+function WhyTwingo() {
+  const cards = [
+    { c: "var(--success)",    h: "Create more, faster",           d: "Launch ads, product videos and micro-dramas without booking a full shoot for every idea." },
+    { c: "var(--vermilion)",  h: "Use real creator identity",     d: "Work with creators and influencers who bring personality, audience and commercial value." },
+    { c: "var(--chartreuse)", h: "Clear rights from day one",     d: "Usage, territory, duration and content type are defined before production begins." },
+    { c: "var(--ink)",        h: "Reduce AI likeness risk",       d: "Avoid scraped faces and unclear rights. Work only with creators who approved the project." },
+  ];
+  return (
+    <section className="section section--tint" id="why">
+      <div className="wrap" style={{ display: "grid", gridTemplateColumns: "0.85fr 1.15fr", gap: 56, alignItems: "start" }}>
+        <div>
+          <p className="eyebrow" style={{ marginBottom: 14 }}>Why businesses use Twingo</p>
+          <h2 className="h2" style={{ maxWidth: 420 }}>The new way to cast talent for <span className="mark">AI content</span>.</h2>
+          <p className="body-lg" style={{ marginTop: 18, maxWidth: 380 }}>Your team needs more content, more speed and more creative variation. Twingo connects you with creator-approved likenesses so you can produce faster — without unclear AI rights.</p>
+        </div>
+        <div className="grid grid-2" style={{ gap: 16 }}>
+          {cards.map((c, i) => (
+            <div key={i} className="card" style={{ padding: 24 }}>
+              <span className="dot" style={{ background: c.c, width: 10, height: 10, display: "inline-block" }} />
+              <h3 className="h3" style={{ fontSize: 18, marginTop: 13 }}>{c.h}</h3>
+              <p className="muted" style={{ fontSize: 14.5, marginTop: 7 }}>{c.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Use cases ---------- */
+function UseCases() {
+  const cases = [
+    { t: "Commercials & social ads",       d: "Product videos, UGC-style creatives and localized campaign variations." },
+    { t: "Micro-dramas & vertical series", d: "Cast creators as recurring characters in romance, thriller or branded fiction." },
+    { t: "Games & interactive stories",    d: "License likenesses for NPCs, trailers or virtual hosts and brand ambassadors." },
+    { t: "Education & edutainment",        d: "Build engaging hosts, teachers and narrators for story-driven learning." },
+  ];
+  return (
+    <section className="section">
+      <div className="wrap">
+        <div style={{ maxWidth: 620, marginBottom: 44 }}>
+          <p className="eyebrow" style={{ marginBottom: 12 }}>Use cases</p>
+          <h2 className="h2">From influencer marketing to influencer production.</h2>
+        </div>
+        <div className="grid grid-4">
+          {cases.map((c, i) => (
+            <div key={i} className="card" style={{ padding: 22 }}>
+              <h3 className="h3" style={{ fontSize: 17 }}>{c.t}</h3>
+              <p className="muted" style={{ fontSize: 14, marginTop: 8 }}>{c.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- How it works ---------- */
+function HowItWorks() {
+  const steps = [
+    { t: "Search creator likenesses", d: "Browse by look, style, audience, niche and approved usage types." },
+    { t: "Request creator approval",  d: "Send your project type, usage plan, platform, territory and creative direction." },
+    { t: "License the rights",        d: "Receive clear commercial usage rights for the approved project or campaign." },
+    { t: "Produce your content",      d: "Create ads, episodes, trailers, games, music videos or branded stories." },
+  ];
+  return (
+    <section className="section section--tint" id="how">
+      <div className="wrap">
+        <div style={{ maxWidth: 620, marginBottom: 44 }}>
+          <p className="eyebrow" style={{ marginBottom: 12 }}>How it works</p>
+          <h2 className="h2">Search. Approve. License. Create.</h2>
+        </div>
+        <div className="grid grid-4">
+          {steps.map((s, i) => (
+            <div key={i}>
+              <span className="stepnum">{i + 1}</span>
+              <h3 className="h3" style={{ fontSize: 18, marginTop: 16 }}>{s.t}</h3>
+              <p className="muted" style={{ fontSize: 14.5, marginTop: 8 }}>{s.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Pricing teaser ---------- */
+function Pricing() {
+  const points = [
+    { c: "var(--success)",   t: "Set by each creator", d: "There are no fixed platform tiers — every creator prices their own likeness based on usage, exclusivity and duration." },
+    { c: "var(--vermilion)", t: "Clear before you commit", d: "You see the rate and usage terms upfront when you request a license — no hidden fees or surprise renewals." },
+    { c: "var(--chartreuse)",t: "Pay only when approved", d: "Nothing is charged until the creator approves your project and the license is signed." },
+  ];
+  return (
+    <section className="section">
+      <div className="wrap">
+        <div style={{ maxWidth: 640, marginBottom: 32 }}>
+          <p className="eyebrow" style={{ marginBottom: 12 }}>Pricing</p>
+          <h2 className="h2">Pricing is set by the creator, not a tier.</h2>
+          <p className="body-lg" style={{ marginTop: 14 }}>Every twin on Twingo is priced individually by the person behind it — based on their reach, niche and the usage you need. Browse twins to see real rates, or tell us your brief and we'll match you with creators in your budget.</p>
+        </div>
+        <div className="grid grid-3" style={{ gap: 16 }}>
+          {points.map((p, i) => (
+            <div key={i} className="card" style={{ padding: 24 }}>
+              <span className="dot" style={{ background: p.c, width: 10, height: 10, display: "inline-block" }} />
+              <h3 className="h3" style={{ fontSize: 17, marginTop: 13 }}>{p.t}</h3>
+              <p className="muted" style={{ fontSize: 14, marginTop: 7 }}>{p.d}</p>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 26 }}>
+          <Button variant="primary" href="browse-twins.html" style={{ background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Browse twins & see rates</Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- FAQ ---------- */
+function FAQ() {
+  const qs = [
+    { q: "What is a likeness marketplace?", a: "A platform where businesses license the approved face, voice, style or digital identity of creators for AI-generated content." },
+    { q: "Can we use a creator likeness for ads?", a: "Yes — commercials, product videos and social ads are among the most common licensed use cases." },
+    { q: "Can we use creators in micro-dramas or films?", a: "Yes, as long as the usage terms cover fiction and episodic content, and the creator has approved the project." },
+    { q: "Can creators reject a project?", a: "Always. Every license request requires the creator's explicit approval before it's granted." },
+    { q: "Can we request exclusivity?", a: "Category or platform exclusivity can be negotiated as part of a Scale or Enterprise plan." },
+  ];
+  const [open, setOpen] = React.useState(0);
+  return (
+    <section className="section section--tint" id="faq">
+      <div className="wrap" style={{ maxWidth: 780 }}>
+        <p className="eyebrow" style={{ marginBottom: 12 }}>FAQ</p>
+        <h2 className="h2" style={{ marginBottom: 30 }}>Questions, answered.</h2>
+        <div className="card" style={{ overflow: "hidden" }}>
+          {qs.map((x, i) => (
+            <div key={i} style={{ borderTop: i ? "1px solid var(--border)" : "none" }}>
+              <button onClick={() => setOpen(open === i ? -1 : i)}
+                style={{ width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer", padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 17, letterSpacing: "-0.01em", color: "var(--ink)" }}>
+                {x.q}
+                <span style={{ color: "var(--text-tertiary)", fontSize: 22, flex: "none", transform: open === i ? "rotate(45deg)" : "none", transition: "transform var(--dur-mid)" }}>+</span>
+              </button>
+              {open === i && <p className="muted" style={{ fontSize: 15, padding: "0 24px 22px", margin: 0, maxWidth: 640 }}>{x.a}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Final CTA ---------- */
+function FinalCTA({ onJoin }) {
+  const [signedIn] = useSignedIn();
+  return (
+    <section className="section">
+      <div className="wrap">
+        <div className="cta-panel" style={{ background: "var(--ink-black)", borderRadius: "var(--radius-xl)", position: "relative", overflow: "hidden" }}>
+          <p className="eyebrow" style={{ color: "var(--lime)", marginBottom: 16 }}>Get started</p>
+          <h2 className="h1" style={{ color: "#fff", maxWidth: 760 }}>The next generation of content needs creator-approved likeness.</h2>
+          <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 18, maxWidth: 620, marginTop: 16, lineHeight: 1.55 }}>
+            Access the faces of the creator economy — approved, licensed and ready for AI-powered production.
+          </p>
+          <div className="cta-panel__row">
+            {!signedIn && <Button variant="lime" onClick={onJoin}>Join Twingo</Button>}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Footer ---------- */
+function Footer() {
+  const col = (h, links) => (
+    <div>
+      <p className="ftr__h">{h}</p>
+      {links.map(l => <a key={l} className="ftr__link" href="#">{l}</a>)}
+    </div>
+  );
+  return (
+    <footer className="ftr">
+      <div className="wrap">
+        <div className="ftr__cols" style={{ gridTemplateColumns: "1.4fr 1fr 1fr 1fr" }}>
+          <div>
+            <TwingoMark wordmark />
+            <p className="muted" style={{ fontSize: 14, maxWidth: 300, marginTop: 16 }}>
+              The marketplace for licensing creator likenesses for AI-powered content — approved, rights-cleared, production-ready.
+            </p>
+          </div>
+          {col("For business", ["License a likeness", "How licensing works", "Use cases", "Pricing"])}
+          <div>
+            <p className="ftr__h">Browse</p>
+            <a className="ftr__link" href="browse-twins.html">Browse AI twins</a>
+          </div>
+          {col("Company", ["About", "Consent policy", "Terms", "Privacy", "Contact"])}
+        </div>
+        <hr className="rule" style={{ margin: "36px 0 20px" }} />
+        <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontSize: 13, color: "var(--text-tertiary)" }}>
+          <span>© 2026 Twingo, Inc. Payments handled by our secure partner.</span>
+          <span className="mono" style={{ fontSize: 12 }}>Licensing · not deepfakes. Every use approved.</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function App() {
+  const [authOpen, setAuthOpen] = React.useState(null);
+  return (
+    <>
+      <SimpleHeader page="home" role="business" anchorBase="" />
+      <Hero onJoin={() => setAuthOpen("signup")} />
+      <WhyTwingo />
+      <UseCases />
+      <HowItWorks />
+      <Pricing />
+      <FAQ />
+      <FinalCTA onJoin={() => setAuthOpen("signup")} />
+      <Footer />
+      <AuthModal open={!!authOpen} mode={authOpen || "signup"} onClose={() => setAuthOpen(null)} />
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

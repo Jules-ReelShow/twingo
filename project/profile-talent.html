@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TwinGo — AI twin profile</title>
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/fonts.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/colors.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/typography.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/spacing.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/effects.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/styles.css" />
+<link rel="stylesheet" href="twingo.css" />
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<script type="text/babel" src="twingo-shared.jsx"></script>
+<script type="text/babel">
+const { Button, Badge, FilterChip, Card, Eyebrow } = window.TwingoDesignSystem_122db6;
+
+function getInf() {
+  const id = new URLSearchParams(location.search).get("id");
+  return INFLUENCERS.find(i => i.id === id) || INFLUENCERS[0];
+}
+
+// Each influencer defines their OWN packages — names, counts and pricing vary.
+const PACKAGE_TEMPLATES = [
+  (r) => [
+    { name: "Single use", price: r, tag: "One approved AI asset", feat: ["One generated piece", "Non-exclusive likeness", "Approval before publish", "Single use, revocable"], variant: "secondary" },
+    { name: "Campaign", price: Math.round(r * 2.2 / 10) * 10, tag: "One campaign · up to 20 assets", feat: ["Up to 20 assets", "Priority approval queue", "Usage analytics", "3-month term"], variant: "primary", pop: true },
+    { name: "Category buyout", price: Math.round(r * 5 / 10) * 10, tag: "Exclusive in your category", feat: ["Category exclusivity", "Custom usage terms", "Direct line to talent", "Signed license contract"], variant: "secondary" },
+  ],
+  (r) => [
+    { name: "Starter", price: r, tag: "Solo creators & tests", feat: ["One AI channel", "Non-exclusive", "Approval on every use", "Monthly, revocable"], variant: "secondary" },
+    { name: "Full likeness", price: Math.round(r * 3 / 10) * 10, tag: "Brands · multi-channel", feat: ["Unlimited channels", "Priority approvals", "Usage dashboard", "Custom terms"], variant: "primary", pop: true },
+  ],
+  (r) => [
+    { name: "Per video", price: r, tag: "One video, one approval", feat: ["Single video use", "Non-exclusive", "Approval before publish", "Revocable"], variant: "secondary" },
+    { name: "Monthly", price: Math.round(r * 2.4 / 10) * 10, tag: "Ongoing use · 1 channel", feat: ["One channel, unlimited assets", "Priority approvals", "Usage analytics", "Cancel anytime"], variant: "primary", pop: true },
+    { name: "Exclusive year", price: Math.round(r * 6 / 10) * 10, tag: "Category lock · 12 months", feat: ["Category exclusivity", "Custom usage terms", "Dedicated liaison", "Enterprise contract"], variant: "secondary" },
+  ],
+];
+const PACKAGES = (inf) => {
+  if (inf.id === "mara") {
+    try {
+      const saved = JSON.parse(localStorage.getItem("twingo-pricing-mara"));
+      if (Array.isArray(saved) && saved.length) {
+        return saved.map(p => ({
+          name: p.name, price: p.price, tag: p.blurb,
+          feat: [p.usage, p.term + " term", "Approval on every use", p.exclusive ? "Category exclusivity" : "Non-exclusive"],
+          variant: p.popular ? "primary" : "secondary",
+        }));
+      }
+    } catch (e) {}
+  }
+  const idx = inf.id.charCodeAt(0) % PACKAGE_TEMPLATES.length;
+  return PACKAGE_TEMPLATES[idx](inf.rate);
+};
+
+function Stat({ n, l }) {
+  return (
+    <div>
+      <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 24, letterSpacing: "-0.02em" }}>{n}</div>
+      <div className="meta" style={{ marginTop: 2 }}>{l}</div>
+    </div>
+  );
+}
+
+/* ---------- Socials feed (Instagram / TikTok) ---------- */
+function SocialsSection({ inf }) {
+  const handle = "@" + inf.name.toLowerCase().replace(/[^a-z]/g, "").slice(0, 10);
+  const platforms = [
+    { key: "Instagram", dot: "var(--vermilion-clay)", handle: handle, followers: inf.followers, meta: inf.eng + " engagement", stat: "Avg 48K likes" },
+    { key: "TikTok", dot: "var(--ink-black)", handle: handle.replace("@", "@") + ".official", followers: "1.9M", meta: "6.4% engagement", stat: "Avg 210K views" },
+  ];
+  return (
+    <section className="section">
+      <div className="wrap">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
+          <div>
+            <p className="eyebrow" style={{ marginBottom: 10 }}>On social</p>
+            <h2 className="h2">Where the real following lives</h2>
+          </div>
+          <span className="meta">Verified & re-synced from connected accounts</span>
+        </div>
+        <div className="grid grid-2" style={{ gap: 24 }}>
+          {platforms.map((p, pi) => (
+            <div key={p.key} className="card" style={{ padding: 24 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+                <span style={{ width: 40, height: 40, borderRadius: 11, flex: "none", background: "center/cover no-repeat url(" + inf.photo + ")" }}></span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontWeight: 600, fontSize: 15 }}>{p.key}</span>
+                    <span className="dot" style={{ background: p.dot }} />
+                  </div>
+                  <div className="meta">{p.handle}</div>
+                </div>
+                <Button variant="secondary" size="sm">View profile</Button>
+              </div>
+              <div style={{ display: "flex", gap: 22, marginBottom: 18 }}>
+                <Stat n={p.followers} l="Followers" />
+                <Stat n={p.meta.split(" ")[0]} l="Engagement" />
+                <Stat n={p.stat.replace("Avg ", "")} l={p.key === "TikTok" ? "Avg views" : "Avg likes"} />
+              </div>
+              <div className="g-thumbs3">
+                {[0, 1, 2].map(i => (
+                  <Portrait key={i} id={"soc-" + p.key.toLowerCase() + "-" + inf.id + "-" + i} name="" src={inf.photo} ratio="1 / 1" radius={10} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Profile() {
+  const inf = getInf();
+  const tiers = PACKAGES(inf);
+  const [modal, setModal] = React.useState(null); // holds tier or null
+  const [msgOpen, setMsgOpen] = React.useState(false);
+  const related = INFLUENCERS.filter(i => i.id !== inf.id && i.niche === inf.niche).slice(0, 4);
+  const filler = INFLUENCERS.filter(i => i.id !== inf.id).slice(0, 4);
+  const rel = (related.length ? related : filler).slice(0, 4);
+
+  return (
+    <>
+      <SimpleHeader page="browse" role="talent" />
+      <HandoffModal open={!!modal} onClose={() => setModal(null)} inf={inf} tier={modal} />
+      <MessageModal open={msgOpen} onClose={() => setMsgOpen(false)} inf={inf} />
+
+      {/* Hero */}
+      <section className="section" style={{ paddingTop: 40, paddingBottom: 48 }}>
+        <div className="wrap">
+          <a href="browse-twins.html" className="meta" style={{ display: "inline-block", marginBottom: 20 }}>← Back to browse</a>
+          <div style={{ display: "grid", gridTemplateColumns: "0.9fr 1.1fr", gap: 40, alignItems: "start" }}>
+            <div className="g-collage">
+              <Portrait id={"pf-main-" + inf.id} name={inf.name} src={inf.photo} ratio="3 / 4" radius={20} style={{ gridRow: "span 2" }} />
+              <Portrait id={"pf-a-" + inf.id} name="" src={CONTENT_IMG(inf.id + "-a")} ratio="1 / 1" radius={16} />
+              <Portrait id={"pf-b-" + inf.id} name="" src={CONTENT_IMG(inf.id + "-b")} ratio="1 / 1" radius={16} />
+            </div>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                <h1 className="h1">{inf.name}</h1>
+              </div>
+              <p className="body-lg" style={{ marginTop: 6, color: "var(--text-secondary)" }}>{inf.niche} creator · {inf.city}</p>
+              <p style={{ fontSize: 16, lineHeight: 1.6, marginTop: 18, maxWidth: 480 }}>
+                {inf.niche} creator known for a warm, editorial style. My AI twin is open to licensing for campaigns in {inf.niche.toLowerCase()}, lifestyle and product — with approval on every use and clear category limits.
+              </p>
+
+              {/* Social stats */}
+              <div className="card" style={{ padding: 22, marginTop: 24 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <span className="eyebrow">Connected socials</span>
+                  <span className="meta">Synced 2h ago</span>
+                </div>
+                <div className="g-stats">
+                  <Stat n={inf.followers} l={inf.platform} />
+                  <Stat n={inf.eng} l="Engagement" />
+                  <Stat n="4.9" l="Talent rating" />
+                  <Stat n="120+" l="Twin licenses" />
+                </div>
+                <div style={{ display: "flex", gap: 8, marginTop: 18, flexWrap: "wrap" }}>
+                  {["Instagram", "TikTok", "YouTube"].map(p => (
+                    <span key={p} style={{ fontSize: 12.5, fontWeight: 500, color: "var(--text-secondary)", border: "1px solid var(--border-strong)", borderRadius: 999, padding: "5px 12px", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <span className="dot" style={{ background: p === inf.platform ? "var(--success)" : "var(--border-strong)" }} />{p}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+                <Button variant="primary" href="talent-dashboard.html" style={{ background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Edit profile</Button>
+              </div>
+              <div style={{ marginTop: 20 }}><TrustRow /></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Packages & pricing */}
+      <section className="section">
+        <div className="wrap">
+          <div style={{ maxWidth: 620, marginBottom: 28 }}>
+            <p className="eyebrow" style={{ marginBottom: 10 }}>Packages & pricing</p>
+            <h2 className="h2">{inf.name.split(" ")[0]}'s licensing packages</h2>
+          </div>
+          <div className="grid grid-3">
+            {tiers.map((t, i) => (
+              <div key={i} className="card" style={{ padding: 26, borderColor: t.variant === "primary" ? "var(--ink)" : "var(--border)", boxShadow: t.variant === "primary" ? "var(--shadow-md)" : "none" }}>
+                <p className="eyebrow" style={{ marginBottom: 10 }}>{t.name}</p>
+                <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 30, letterSpacing: "-0.02em" }}>${t.price}</div>
+                <p className="muted" style={{ fontSize: 13.5, marginTop: 6 }}>{t.tag}</p>
+                <ul style={{ listStyle: "none", padding: 0, margin: "18px 0 22px", display: "grid", gap: 10 }}>
+                  {t.feat.map((f, k) => (
+                    <li key={k} style={{ display: "flex", gap: 9, fontSize: 13.5, color: "var(--text-secondary)" }}>
+                      <span className="dot" style={{ background: "var(--success)", marginTop: 7 }} />{f}
+                    </li>
+                  ))}
+                </ul>
+                <Button variant={t.variant === "primary" ? "lime" : "secondary"} onClick={() => setModal(t)} style={{ width: "100%", justifyContent: "center", display: "none" }}>Request this package</Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Portfolio */}
+      <section className="section section--tint">
+        <div className="wrap">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
+            <div>
+              <p className="eyebrow" style={{ marginBottom: 10 }}>Portfolio</p>
+              <h2 className="h2">{inf.name.split(" ")[0]}'s media & client work</h2>
+            </div>
+            <span className="meta">Photos, videos and past collaborations {inf.name.split(" ")[0]} has added</span>
+          </div>
+          <div className="grid grid-4">
+            {[
+              { cap: "Portrait set", kind: "Photo" },
+              { cap: "Skincare campaign", kind: "Client work" },
+              { cap: "Lifestyle reel", kind: "Video" },
+              { cap: "Brand collab", kind: "Client work" },
+              { cap: "Editorial shoot", kind: "Photo" },
+              { cap: "Behind the scenes", kind: "Video" },
+              { cap: "Lookbook", kind: "Photo" },
+              { cap: "Product launch", kind: "Client work" },
+            ].map((item, i) => (
+              <div key={i} className="card card--hover" style={{ overflow: "hidden" }}>
+                <Portrait id={"port-" + inf.id + "-" + i} name="" src={inf.photo} ratio="1 / 1" radius={0} style={{ borderRadius: 0 }} />
+                <div style={{ padding: "12px 14px" }}>
+                  <span style={{ fontSize: 13, fontWeight: 500 }}>{item.cap}</span>
+                  <div className="meta" style={{ marginTop: 3 }}>{item.kind}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Socials feed */}
+      <SocialsSection inf={inf} />
+
+      {/* Usage terms / trust */}
+      <section className="section section--tint">
+        <div className="wrap" style={{ display: "grid", gridTemplateColumns: "0.8fr 1.2fr", gap: 40 }}>
+          <div>
+            <p className="eyebrow" style={{ marginBottom: 10 }}>Usage terms</p>
+            <h2 className="h2" style={{ fontSize: 28 }}>What this license does and doesn't allow.</h2>
+            <p className="muted" style={{ marginTop: 12, fontSize: 15 }}>Set by the talent, enforced by Twingo, secured at checkout.</p>
+          </div>
+          <div className="grid grid-2" style={{ gap: 14 }}>
+            {[
+              { ok: true, t: "AI-generated stills & video in agreed niches" },
+              { ok: true, t: "Product & brand campaigns with approval" },
+              { ok: false, t: "Political, adult, or medical claims" },
+              { ok: false, t: "Any use before per-piece approval" },
+            ].map((x, i) => (
+              <div key={i} className="card" style={{ padding: 18, display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <span className="dot" style={{ width: 10, height: 10, marginTop: 6, background: x.ok ? "var(--success)" : "var(--vermilion)" }} />
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: x.ok ? "var(--badge-paid-fg)" : "var(--vermilion)" }}>{x.ok ? "Allowed" : "Not allowed"}</div>
+                  <div style={{ fontSize: 14.5, marginTop: 4 }}>{x.t}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Related */}
+      <section className="section">
+        <div className="wrap">
+          <h2 className="h2" style={{ marginBottom: 24 }}>More {inf.niche.toLowerCase()} twins</h2>
+          <div className="grid grid-4">
+            {rel.map(r => <InfluencerCard key={r.id} inf={r} />)}
+          </div>
+        </div>
+      </section>
+      <Footer />
+    </>
+  );
+}
+
+const __el=document.getElementById("root"); (window.__twRoot=window.__twRoot||ReactDOM.createRoot(__el)).render(<Profile />);
+</script>
+</body>
+</html>

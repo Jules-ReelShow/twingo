@@ -1,0 +1,21 @@
+/* ═══════════════ ShowCrew — Elevation, motion & effects ═══════════════
+   Shadows are soft, near-black and rare — borders do most of the work. */
+:root {
+  /* Elevation — three soft near-black steps */
+  --shadow-sm: 0 1px 2px rgba(13, 10, 10, 0.05);   /* resting controls */
+  --shadow-md: 0 4px 16px rgba(13, 10, 10, 0.07);  /* raised */
+  --shadow-lg: 0 14px 44px rgba(13, 10, 10, 0.10); /* card hover lift */
+  --shadow-focus: 0 6px 20px rgba(13, 10, 10, 0.08); /* input focus */
+
+  /* Blur — the frosted sticky header */
+  --blur-header: saturate(180%) blur(12px);   /* @kind other */
+
+  /* Motion — short, calm, no bounce */
+  --dur-fast: 0.12s;   /* @kind other */
+  --dur-mid: 0.16s;    /* @kind other */
+  --ease: ease;        /* @kind other */
+
+  /* Signature interactions */
+  --lift-card: translateY(-3px);   /* @kind other */
+  --press: translateY(1px);        /* @kind other */
+}

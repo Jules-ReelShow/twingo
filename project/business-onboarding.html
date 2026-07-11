@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Twingo — Tell us about your business</title>
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/fonts.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/colors.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/typography.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/spacing.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/effects.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/styles.css" />
+<link rel="stylesheet" href="twingo.css" />
+<link rel="stylesheet" href="onboarding-flow.css" />
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<script type="text/babel" src="twingo-shared.jsx"></script>
+<script type="text/babel">
+const { Button, Input } = window.TwingoDesignSystem_122db6;
+const { TwingoMark } = window;
+
+const BIZ_NAME_KEY = "twingo-business-name";
+
+function BusinessOnboarding() {
+  const [name, setName] = React.useState("");
+  React.useEffect(() => { setRole("buyer"); }, []);
+  const submit = (e) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    try { localStorage.setItem(BIZ_NAME_KEY, name.trim()); } catch (err) {}
+    window.location.href = "buyer-dashboard.html";
+  };
+  return (
+    <div className="obf-page">
+      <div className="obf-topmark"><TwingoMark wordmark /></div>
+      <div className="obf-wrap">
+        <div className="obf-stepper">
+          <div className="obf-bar"><span style={{ width: "100%" }} /></div>
+        </div>
+      </div>
+      <div className="obf-stage">
+        <div className="obf-inner">
+          <div className="obf-card">
+            <h1 className="obf-h1">One last thing — what's your business called?</h1>
+            <p className="obf-p">This is how talent will see you when you request a license or send a brief.</p>
+            <form onSubmit={submit} style={{ marginTop: 6 }}>
+              <label className="auth__field">
+                <span className="auth__label">Business or company name</span>
+                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Aperture AI" autoFocus />
+              </label>
+              <Button variant="primary" type="submit" disabled={!name.trim()} style={{ width: "100%", justifyContent: "center", display: "flex", marginTop: 18, background: name.trim() ? "var(--lime)" : "var(--surface-muted)", borderColor: name.trim() ? "var(--lime)" : "var(--surface-muted)", color: name.trim() ? "var(--ink-black)" : "var(--text-tertiary)" }}>Continue to your dashboard</Button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const __el = document.getElementById("root");
+(window.__twRoot = window.__twRoot || ReactDOM.createRoot(__el)).render(<BusinessOnboarding />);
+</script>
+</body>
+</html>

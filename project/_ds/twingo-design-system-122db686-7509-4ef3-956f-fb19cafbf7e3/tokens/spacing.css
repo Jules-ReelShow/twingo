@@ -1,0 +1,26 @@
+/* ═══════════════ ShowCrew — Spacing, radii & layout ═══════════════
+   4px spacing base; five corner steps up to a full pill. */
+:root {
+  /* Spacing · 4px base */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+  --sp-20: 80px;
+
+  /* Radius */
+  --radius-sm: 8px;      /* small controls */
+  --radius-md: 12px;     /* inputs */
+  --radius-lg: 16px;     /* cards, swatches */
+  --radius-xl: 24px;     /* large panels */
+  --radius-pill: 999px;  /* buttons, chips, badges */
+
+  /* Layout */
+  --container: 1160px;   /* content max width */
+  --wrap-pad: 24px;      /* horizontal gutter */
+  --header-h: 64px;      /* sticky header */
+}

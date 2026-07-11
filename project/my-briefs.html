@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Twingo — My briefs</title>
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/fonts.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/colors.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/typography.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/spacing.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/effects.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/styles.css" />
+<link rel="stylesheet" href="twingo.css" />
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<script type="text/babel" src="twingo-shared.jsx"></script>
+<script type="text/babel">
+const { Button, Input } = window.TwingoDesignSystem_122db6;
+
+const CHIP = {
+  active: { color: "#4B7A1E", background: "#EEF9DC" },
+  pending:{ color: "#7A5A00", background: "#FFF3C4" },
+  muted:  { color: "#6C6E76", background: "#F0F1F4" },
+};
+function Chip({ tone = "muted", children }) {
+  return <span className="dchip" style={CHIP[tone]}>{children}</span>;
+}
+function Avatar({ inf, size = 44, radius = 14 }) {
+  return <span className="drow__logo" style={{ width: size, height: size, borderRadius: radius, background: inf.photo ? `center/cover no-repeat url(${inf.photo})` : "linear-gradient(135deg,#1C212B,#5A5B60)" }}>{inf.photo ? "" : inf.name.split(" ").map(w => w[0]).join("").slice(0,2)}</span>;
+}
+
+const BRIEFS_KEY = "twingo-my-briefs";
+const DEFAULT_BRIEFS = [
+  { id: 1, title: "AI twin for SPF product launch commercial", niche: "Commercial", platform: "Instagram", budget: "$800 – $1,500", applicants: 6, status: "open", posted: "2d ago" },
+  { id: 2, title: "Recipe series host, 12 short clips", niche: "Social Media / Reels", platform: "TikTok", budget: "$500 – $900", applicants: 3, status: "open", posted: "5d ago" },
+  { id: 3, title: "Lookbook stills + reels for capsule drop", niche: "Branded Content", platform: "Instagram", budget: "$900 – $1,600", applicants: 9, status: "filled", posted: "3w ago" },
+];
+function loadBriefs() {
+  try { const s = JSON.parse(localStorage.getItem(BRIEFS_KEY)); if (Array.isArray(s)) return s; } catch (e) {}
+  return DEFAULT_BRIEFS;
+}
+function saveBriefs(b) { try { localStorage.setItem(BRIEFS_KEY, JSON.stringify(b)); } catch (e) {} }
+
+function AddBriefModal({ open, onClose, onAdd }) {
+  const [title, setTitle] = React.useState("");
+  const [niche, setNiche] = React.useState("");
+  const [platform, setPlatform] = React.useState("");
+  const [budget, setBudget] = React.useState("");
+  const [description, setDescription] = React.useState("");
+  const reset = () => { setTitle(""); setNiche(""); setPlatform(""); setBudget(""); setDescription(""); };
+  const submit = (e) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+    onAdd({ id: Date.now(), title: title.trim(), niche: niche.trim() || "General", platform: platform.trim() || "Instagram", budget: budget.trim() || "Custom", description: description.trim(), applicants: 0, status: "open", posted: "Just now" });
+    reset(); onClose();
+  };
+  return (
+    <div className={"overlay" + (open ? " overlay--on" : "")} onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 520 }} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+        <p className="eyebrow" style={{ marginBottom: 10 }}>New brief</p>
+        <h3 className="h3">Post a brief for talent to apply to</h3>
+        <form onSubmit={submit} style={{ marginTop: 16 }}>
+          <label className="auth__field">
+            <span className="auth__label">Brief title</span>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. AI twin for SPF product launch video" autoFocus />
+          </label>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
+            <label className="auth__field">
+              <span className="auth__label">Category</span>
+              <Input value={niche} onChange={(e) => setNiche(e.target.value)} placeholder="Commercial" />
+            </label>
+            <label className="auth__field">
+              <span className="auth__label">Platform</span>
+              <Input value={platform} onChange={(e) => setPlatform(e.target.value)} placeholder="Instagram" />
+            </label>
+          </div>
+          <label className="auth__field" style={{ marginTop: 12 }}>
+            <span className="auth__label">Budget range</span>
+            <Input value={budget} onChange={(e) => setBudget(e.target.value)} placeholder="$800 – $1,500" />
+          </label>
+          <label className="auth__field" style={{ marginTop: 12 }}>
+            <span className="auth__label">Description</span>
+            <textarea className="msg__area" rows={4} value={description} onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe the campaign, deliverables, and what you're looking for in a twin."></textarea>
+          </label>
+          <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+            <Button variant="primary" type="submit" style={{ flex: 1, justifyContent: "center", display: "flex", background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }} disabled={!title.trim()}>Post brief</Button>
+            <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function MyBriefs() {
+  const [briefs, setBriefs] = React.useState(loadBriefs);
+  const [addOpen, setAddOpen] = React.useState(false);
+  const addBrief = (b) => setBriefs(prev => { const next = [b, ...prev]; saveBriefs(next); return next; });
+
+  // Active licenses & content — same shape as the buyer dashboard
+  const licenses = [
+    { inf: INFLUENCERS[0], tier: "Campaign", spent: 2940, channel: "Aperture skincare AI" },
+    { inf: INFLUENCERS[6], tier: "Monthly", spent: 2040, channel: "Halo product reels" },
+  ];
+  const DEFAULT_SUBS = [
+    { id: 1, talentId: "mara", buyer: "Aperture AI", asset: "Skincare hero — variant 3", description: "Product hero still for our spring skincare launch.", tier: "Campaign", when: "2h ago", status: "pending" },
+  ];
+  const [subs] = useSubmissions(DEFAULT_SUBS);
+
+  return (
+    <>
+      <SimpleHeader page="briefs" role="business" />
+      <AddBriefModal open={addOpen} onClose={() => setAddOpen(false)} onAdd={addBrief} />
+      <main className="wrap" style={{ paddingTop: 34, paddingBottom: 80 }}>
+        <div className="dash-head">
+          <div>
+            <h1 className="dash-h1">My briefs</h1>
+            <p className="dash-sub">Post a brief and talent will apply directly.</p>
+          </div>
+          <Button variant="primary" onClick={() => setAddOpen(true)} style={{ background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Add brief</Button>
+        </div>
+
+        <div className="dstats" style={{ marginTop: 26 }}>
+          <div className="dstat dstat--dark">
+            <div className="dstat__k">Open briefs</div>
+            <div className="dstat__n">{briefs.filter(b => b.status === "open").length}</div>
+            <div className="dstat__f">Live on Browse briefs</div>
+          </div>
+          <div className="dstat">
+            <div className="dstat__k">Total applicants</div>
+            <div className="dstat__n">{briefs.reduce((s, b) => s + b.applicants, 0)}</div>
+            <div className="dstat__f">Across all briefs</div>
+          </div>
+          <div className="dstat">
+            <div className="dstat__k">Active licenses</div>
+            <div className="dstat__n">{licenses.length}</div>
+            <div className="dstat__f">${licenses.reduce((s, l) => s + l.spent, 0).toLocaleString()} spent</div>
+          </div>
+        </div>
+
+        <div className="dgrid">
+          <div className="dcol">
+            <div className="dpanel">
+              <div className="dpanel__head">
+                <h2 className="dpanel__title">Your briefs</h2>
+                <a className="dpanel__link" href="browse-briefs.html">View public listing</a>
+              </div>
+              <div className="dpanel__list">
+                {briefs.map((b) => (
+                  <div key={b.id} className="drow">
+                    <span className="drow__logo" style={{ background: "linear-gradient(135deg,#1C212B,#5A5B60)" }}>{b.niche.slice(0,2).toUpperCase()}</span>
+                    <div className="drow__main">
+                      <div className="drow__t">{b.title}</div>
+                      <div className="drow__m">{b.niche} · {b.platform} · {b.budget} · posted {b.posted}</div>
+                    </div>
+                    <div className="drow__amt" style={{ fontSize: 13.5 }}>{b.applicants} applicant{b.applicants === 1 ? "" : "s"}</div>
+                    {b.status === "filled" ? <Chip tone="muted">Filled</Chip> : <Chip tone="active">Open</Chip>}
+                  </div>
+                ))}
+                {briefs.length === 0 && <div style={{ padding: "18px 0", textAlign: "center" }} className="muted">No briefs yet — post one to start receiving applicants.</div>}
+              </div>
+            </div>
+
+            <div className="dpanel">
+              <div className="dpanel__head">
+                <h2 className="dpanel__title">Active licenses & content</h2>
+                <a className="dpanel__link" href="buyer-dashboard.html">Manage in dashboard</a>
+              </div>
+              <div className="dpanel__list">
+                {licenses.map((l, i) => (
+                  <div key={i} className="drow">
+                    <Avatar inf={l.inf} />
+                    <div className="drow__main">
+                      <div className="drow__t">{l.inf.name}</div>
+                      <div className="drow__m">{l.tier} · {l.channel}</div>
+                    </div>
+                    <div className="drow__amt">${l.spent.toLocaleString()}<span className="muted" style={{ fontWeight: 400 }}> spent</span></div>
+                  </div>
+                ))}
+                {subs.map((a) => (
+                  <div key={"s" + a.id} className="drow">
+                    <Avatar inf={INFLUENCERS.find(x => x.id === a.talentId) || INFLUENCERS[0]} />
+                    <div className="drow__main">
+                      <div className="drow__t">{a.asset}</div>
+                      <div className="drow__m">{(INFLUENCERS.find(x => x.id === a.talentId) || {}).name} · Awaiting talent approval</div>
+                    </div>
+                    <Chip tone="pending">In review</Chip>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="dcol">
+            <div className="dpanel dpanel--tint">
+              <div className="dpanel__head">
+                <h2 className="dpanel__title" style={{ fontSize: 16 }}>Tips for a strong brief</h2>
+              </div>
+              <ul style={{ margin: "6px 0 0", padding: "0 0 0 18px", display: "grid", gap: 10, fontSize: 13.5, color: "var(--text-secondary)" }}>
+                <li>Be specific about platform and format — reel, still set, or ongoing series.</li>
+                <li>Give a real budget range; vague briefs get fewer quality applicants.</li>
+                <li>Mention usage terms upfront — exclusivity and duration matter to talent.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
+const __el = document.getElementById("root");
+(window.__twRoot = window.__twRoot || ReactDOM.createRoot(__el)).render(<MyBriefs />);
+</script>
+</body>
+</html>
