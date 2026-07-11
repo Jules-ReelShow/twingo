@@ -276,26 +276,30 @@ function ThemeToggle() {
 function SimpleHeader({ page, role, anchorBase = "talent-home.html" }) {
   const [signedIn] = useSignedIn();
   const [authOpen, setAuthOpen] = React.useState(null);
+  const [drawer, setDrawer] = React.useState(false);
   const showBriefs = role !== "business" && signedIn;
   const dashHref = role === "business" ? "buyer-dashboard.html" : "talent-dashboard.html";
+  const navItems = [
+    role === "business"
+      ? { key: "browse", href: "browse-twins.html", label: "Browse twins" }
+      : showBriefs ? { key: "briefs", href: "browse-briefs.html", label: "Browse briefs" } : null,
+    !signedIn && { key: "how", href: anchorBase + "#how", label: "How it works" },
+    !signedIn && { key: "why", href: anchorBase + "#why", label: role === "business" ? "Why Twingo" : "Why join" },
+    !signedIn && { key: "faq", href: anchorBase + "#faq", label: "FAQ" },
+    signedIn && { key: "dash", href: dashHref, label: "Dashboard" },
+  ].filter(Boolean);
   return (
     <>
       <header className="hdr">
         <div className="wrap hdr__in">
           <TwingoMark wordmark />
           <nav className="hdr__nav">
-            {role === "business" ? (
-              <a href="browse-twins.html" className={"navlink" + (page === "browse" ? " navlink--active" : "")}>Browse twins</a>
-            ) : showBriefs ? (
-              <a href="browse-briefs.html" className={"navlink" + (page === "briefs" ? " navlink--active" : "")}>Browse briefs</a>
-            ) : null}
-            {!signedIn && <a href={anchorBase + "#how"} className="navlink">How it works</a>}
-            {!signedIn && <a href={anchorBase + "#why"} className="navlink">{role === "business" ? "Why Twingo" : "Why join"}</a>}
-            {!signedIn && <a href={anchorBase + "#faq"} className="navlink">FAQ</a>}
-            {signedIn && <a href={dashHref} className={"navlink" + (page === "dash" ? " navlink--active" : "")}>Dashboard</a>}
+            {navItems.map(n => (
+              <a key={n.key} href={n.href} className={"navlink" + (page === n.key ? " navlink--active" : "")}>{n.label}</a>
+            ))}
           </nav>
           <div className="spacer" />
-          <div className="hdr__desk" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div className="hdr__desk">
             <RoleSwitcher active={role || "talent"} />
             <ThemeToggle />
             {signedIn ? (
@@ -307,10 +311,71 @@ function SimpleHeader({ page, role, anchorBase = "talent-home.html" }) {
               </>
             )}
           </div>
+          <button className="hdr__burger" aria-label="Open menu" onClick={() => setDrawer(true)}>
+            <span></span><span></span><span></span>
+          </button>
         </div>
       </header>
+      <HeaderDrawer open={drawer} onClose={() => setDrawer(false)} role={role} dashHref={dashHref}
+        navItems={navItems} page={page} signedIn={signedIn}
+        onAuth={(m) => { setDrawer(false); setAuthOpen(m); }} />
       <AuthModal open={!!authOpen} mode={authOpen || "signin"} audience={role} onClose={() => setAuthOpen(null)} />
     </>
+  );
+}
+
+/* ---------- Mobile nav drawer (used by SimpleHeader below the header breakpoint) ---------- */
+function HeaderDrawer({ open, onClose, role, dashHref, navItems, page, signedIn, onAuth }) {
+  React.useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return (
+    <ModalPortal>
+    <div className={"drawer" + (open ? " drawer--on" : "")} onClick={onClose}>
+      <aside className="drawer__panel" onClick={(e) => e.stopPropagation()}>
+        <div className="drawer__top">
+          <TwingoMark wordmark />
+          <button className="auth__x" style={{ position: "static" }} onClick={onClose} aria-label="Close">×</button>
+        </div>
+        {signedIn && (
+          <div className="drawer__user">
+            <img src={MOCK_USER.photo} alt="" className="menu__ava" />
+            <div style={{ minWidth: 0 }}>
+              <div className="menu__name">{MOCK_USER.name}</div>
+              <div className="menu__email">{MOCK_USER.email}</div>
+            </div>
+          </div>
+        )}
+        <div className="drawer__mode">
+          <RoleSwitcher active={role || "talent"} />
+          <ThemeToggle />
+        </div>
+        <nav className="drawer__nav">
+          {navItems.map(n => (
+            <a key={n.key} href={n.href} className={"drawer__link" + (page === n.key ? " drawer__link--active" : "")}>{n.label}</a>
+          ))}
+          {signedIn && <a href={"messages.html?as=" + (dashHref.startsWith("buyer") ? "business" : "talent")} className="drawer__link">Messages</a>}
+          {signedIn && (
+            <a href={dashHref.startsWith("buyer") ? "my-briefs.html" : "profile-talent.html?id=mara"} className="drawer__link">
+              {dashHref.startsWith("buyer") ? "My briefs" : "My public profile"}
+            </a>
+          )}
+        </nav>
+        <div className="drawer__foot">
+          {signedIn ? (
+            <a href="talent-home.html" className="menu__item menu__item--danger" onClick={() => setSignedIn(false)} style={{ padding: "12px 4px" }}>Sign out</a>
+          ) : (
+            <div style={{ display: "grid", gap: 10 }}>
+              <Button variant="secondary" onClick={() => onAuth("signin")} style={{ width: "100%", justifyContent: "center", display: "flex" }}>Sign in</Button>
+              <Button variant="primary" onClick={() => onAuth("signup")} style={{ width: "100%", justifyContent: "center", display: "flex" }}>Join</Button>
+            </div>
+          )}
+        </div>
+      </aside>
+    </div>
+    </ModalPortal>
   );
 }
 
