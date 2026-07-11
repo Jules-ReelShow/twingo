@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TwinGo — Help &amp; Support</title>
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/fonts.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/colors.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/typography.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/spacing.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/effects.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/styles.css" />
+<link rel="stylesheet" href="twingo.css" />
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<script type="text/babel" src="twingo-shared.jsx"></script>
+<script type="text/babel">
+const { Button, Input } = window.TwingoDesignSystem_122db6;
+const { SimpleHeader, Footer } = window;
+
+const TOPICS = [
+  { key: "start", label: "Getting started", desc: "Signing up, verifying your accounts, publishing your twin." },
+  { key: "license", label: "Licensing & approvals", desc: "How offers, packages and content approval work." },
+  { key: "pay", label: "Payments & payouts", desc: "How and when you get paid, and how checkout works." },
+  { key: "account", label: "Account & privacy", desc: "Consent, revoking a license, and data controls." },
+];
+
+const FAQS = [
+  { cat: "start", q: "How do I create my AI twin?", a: "During sign-up you'll connect at least one social account (Instagram, TikTok or YouTube) so we can verify your stats, then upload reference photos of yourself. Your twin is ready to publish once your identity is verified." },
+  { cat: "start", q: "How long does verification take?", a: "Most accounts are verified in under 3 minutes. Occasionally identity checks are reviewed manually, which can take up to a business day." },
+  { cat: "license", q: "How do offers and packages work?", a: "You set your own packages (single use, campaign, category buyout, etc.) and price each one. When a business requests a package, it lands in your Offers queue for you to accept or decline." },
+  { cat: "license", q: "Who approves content before it goes live?", a: "You do. Every generated asset is submitted to your approval queue, and nothing is published or delivered to the business until you approve it." },
+  { cat: "license", q: "Can I revoke a license after accepting it?", a: "Yes. Active licenses can be revoked at any time from your dashboard. Any content already published under a signed contract is handled per the terms you agreed to at checkout." },
+  { cat: "pay", q: "When do I get paid?", a: "Payouts are released once a licensed asset is approved and delivered. You can track pending and available balance from your dashboard, and withdraw at any time." },
+  { cat: "pay", q: "Who handles checkout?", a: "TwinGo is the marketplace and consent layer. Payment and contracts are completed with our secure checkout partner — TwinGo never stores card details." },
+  { cat: "account", q: "Is this deepfakes?", a: "No. TwinGo is opt-in AI twin licensing. You explicitly consent, set your own terms, approve every use, and can revoke access at any time." },
+  { cat: "account", q: "How do I update my notification or privacy settings?", a: "Head to Settings from your profile menu — you can manage notifications, password, two-factor authentication and account deactivation there." },
+];
+
+function TopicCard({ t, active, onClick }) {
+  return (
+    <button onClick={onClick} className="card" style={{ textAlign: "left", cursor: "pointer", padding: 20, border: "1px solid " + (active ? "var(--ink)" : "var(--border)"), background: "var(--card-bg)" }}>
+      <h3 className="h3" style={{ fontSize: 16 }}>{t.label}</h3>
+      <p className="muted" style={{ fontSize: 13.5, marginTop: 6 }}>{t.desc}</p>
+    </button>
+  );
+}
+
+function FAQList({ items }) {
+  const [open, setOpen] = React.useState(0);
+  return (
+    <div className="card" style={{ overflow: "hidden" }}>
+      {items.map((x, i) => (
+        <div key={x.q} style={{ borderTop: i ? "1px solid var(--border)" : "none" }}>
+          <button onClick={() => setOpen(open === i ? -1 : i)}
+            style={{ width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer", padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 16, letterSpacing: "-0.01em", color: "var(--ink)" }}>
+            {x.q}
+            <span style={{ color: "var(--text-tertiary)", fontSize: 22, flex: "none", transform: open === i ? "rotate(45deg)" : "none", transition: "transform var(--dur-mid)" }}>+</span>
+          </button>
+          {open === i && <p className="muted" style={{ fontSize: 15, padding: "0 24px 22px", margin: 0 }}>{x.a}</p>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ContactCard() {
+  return (
+    <div className="dpanel" style={{ display: "grid", gap: 14 }}>
+      <div>
+        <h2 className="dpanel__title">Still need help?</h2>
+        <p className="muted" style={{ fontSize: 13.5, marginTop: 6 }}>Our team typically replies within a few hours.</p>
+      </div>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <Button variant="primary" href="mailto:support@twingo.co">Email support</Button>
+        <Button variant="secondary" onClick={() => alert("This would open a live chat widget.")}>Start a chat</Button>
+      </div>
+    </div>
+  );
+}
+
+function HelpSupportPage() {
+  const [role] = useRole();
+  const isBusiness = role === "buyer";
+  const dashHref = isBusiness ? "buyer-dashboard.html" : "talent-dashboard.html";
+  const [topic, setTopic] = React.useState("all");
+  const [query, setQuery] = React.useState("");
+  const filtered = FAQS.filter(f =>
+    (topic === "all" || f.cat === topic) &&
+    (!query.trim() || f.q.toLowerCase().includes(query.trim().toLowerCase()))
+  );
+  return (
+    <>
+      <SimpleHeader page="help" role={isBusiness ? "business" : "talent"} />
+      <main className="wrap" style={{ paddingTop: 30, paddingBottom: 80, maxWidth: 780 }}>
+        <div className="dash-head" style={{ marginBottom: 6 }}>
+          <div>
+            <h1 className="dash-h1">Help &amp; Support</h1>
+            <p className="dash-sub">Find answers, or reach our team directly.</p>
+          </div>
+          <Button variant="secondary" href={dashHref}>Back to dashboard</Button>
+        </div>
+
+        <div style={{ marginTop: 26 }}>
+          <Input placeholder="Search help articles…" value={query} onChange={(e) => setQuery(e.target.value)} style={{ width: "100%" }} />
+        </div>
+
+        <div className="grid grid-2" style={{ gap: 12, marginTop: 20 }}>
+          {TOPICS.map(t => <TopicCard key={t.key} t={t} active={topic === t.key} onClick={() => setTopic(topic === t.key ? "all" : t.key)} />)}
+        </div>
+
+        <div style={{ marginTop: 30 }}>
+          <h2 className="h3" style={{ marginBottom: 14 }}>{topic === "all" ? "Frequently asked questions" : TOPICS.find(t => t.key === topic).label}</h2>
+          {filtered.length
+            ? <FAQList items={filtered} />
+            : <p className="muted" style={{ fontSize: 14.5 }}>No articles match “{query}”.</p>}
+        </div>
+
+        <div style={{ marginTop: 30 }}>
+          <ContactCard />
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+const __el = document.getElementById("root");
+(window.__twRoot = window.__twRoot || ReactDOM.createRoot(__el)).render(<HelpSupportPage />);
+</script>
+</body>
+</html>

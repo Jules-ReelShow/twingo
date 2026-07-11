@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TwinGo — Settings</title>
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/fonts.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/colors.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/typography.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/spacing.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/effects.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/styles.css" />
+<link rel="stylesheet" href="twingo.css" />
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<script type="text/babel" src="twingo-shared.jsx"></script>
+<script type="text/babel">
+const { Button } = window.TwingoDesignSystem_122db6;
+const { SimpleHeader, Footer, Portrait, MOCK_USER } = window;
+
+function Toggle({ on, onClick }) {
+  return <span className={"tp-toggle" + (on ? " tp-toggle--on" : "")} onClick={onClick} role="switch" aria-checked={on}><span className="tp-toggle__track"><span className="tp-toggle__knob"></span></span></span>;
+}
+
+const NOTIF_DEFAULTS = [
+  { key: "offers", label: "New offers & briefs", desc: "Get notified when a business sends you an offer or posts a matching brief.", on: true },
+  { key: "messages", label: "Messages", desc: "Get notified when someone sends you a new message.", on: true },
+  { key: "approvals", label: "Approval reminders", desc: "Reminders for content that's waiting on your sign-off.", on: true },
+  { key: "product", label: "Product updates", desc: "Occasional news about new TwinGo features.", on: false },
+  { key: "marketing", label: "Marketing emails", desc: "Tips, case studies and promotions.", on: false },
+];
+
+function NotificationsCard() {
+  const [items, setItems] = React.useState(NOTIF_DEFAULTS);
+  const toggle = (key) => setItems(items.map(i => i.key === key ? { ...i, on: !i.on } : i));
+  return (
+    <div className="dpanel">
+      <h2 className="dpanel__title">Notifications</h2>
+      <p className="muted" style={{ fontSize: 13.5, marginTop: 4, marginBottom: 18 }}>Choose what TwinGo emails you about.</p>
+      <div style={{ display: "grid", gap: 4 }}>
+        {items.map((i, k) => (
+          <div key={i.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "13px 0", borderTop: k ? "1px solid var(--border)" : "none" }}>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)" }}>{i.label}</div>
+              <div className="muted" style={{ fontSize: 13, marginTop: 2 }}>{i.desc}</div>
+            </div>
+            <Toggle on={i.on} onClick={() => toggle(i.key)} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProfileCard() {
+  return (
+    <div className="dpanel">
+      <h2 className="dpanel__title">Profile</h2>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 16, marginBottom: 6 }}>
+        <img src={MOCK_USER.photo} alt="" style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", flex: "none" }} />
+        <div style={{ display: "flex", gap: 8 }}>
+          <Button variant="secondary" size="sm">Change photo</Button>
+          <Button variant="secondary" size="sm" style={{ color: "var(--vermilion)" }}>Remove</Button>
+        </div>
+      </div>
+      <div className="hub-row2" style={{ marginTop: 14 }}>
+        <label className="hub-field"><span className="hub-field__l">Full name</span><input defaultValue={MOCK_USER.name} /></label>
+        <label className="hub-field"><span className="hub-field__l">Email</span><input type="email" defaultValue={MOCK_USER.email} /></label>
+      </div>
+      <div className="hub-row2">
+        <label className="hub-field"><span className="hub-field__l">Phone</span><input type="tel" placeholder="+1 (555) 000-0000" /></label>
+        <label className="hub-field"><span className="hub-field__l">Location</span><input defaultValue="Los Angeles, CA" /></label>
+      </div>
+      <Button variant="primary" style={{ marginTop: 4 }}>Save changes</Button>
+    </div>
+  );
+}
+
+function SecurityCard() {
+  return (
+    <div className="dpanel">
+      <h2 className="dpanel__title">Password &amp; security</h2>
+      <div className="hub-field" style={{ marginTop: 16 }}><span className="hub-field__l">Current password</span><input type="password" placeholder="••••••••" /></div>
+      <div className="hub-row2">
+        <label className="hub-field"><span className="hub-field__l">New password</span><input type="password" placeholder="••••••••" /></label>
+        <label className="hub-field"><span className="hub-field__l">Confirm new password</span><input type="password" placeholder="••••••••" /></label>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "13px 0", borderTop: "1px solid var(--border)", marginTop: 4 }}>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)" }}>Two-factor authentication</div>
+          <div className="muted" style={{ fontSize: 13, marginTop: 2 }}>Require a code at sign-in, in addition to your password.</div>
+        </div>
+        <Toggle on={false} onClick={() => {}} />
+      </div>
+      <Button variant="primary" style={{ marginTop: 14 }}>Update password</Button>
+    </div>
+  );
+}
+
+function DangerZoneCard() {
+  return (
+    <div className="dpanel" style={{ borderColor: "rgba(209,47,0,0.35)" }}>
+      <h2 className="dpanel__title" style={{ color: "var(--vermilion)" }}>Danger zone</h2>
+      <p className="muted" style={{ fontSize: 13.5, marginTop: 6 }}>Deactivating pauses your listing and any active licenses. This can be undone by signing back in within 30 days.</p>
+      <Button variant="secondary" style={{ marginTop: 14, color: "var(--vermilion)", borderColor: "rgba(209,47,0,0.35)" }}>Deactivate account</Button>
+    </div>
+  );
+}
+
+function SettingsPage() {
+  const [role] = useRole();
+  const isBusiness = role === "buyer";
+  const dashHref = isBusiness ? "buyer-dashboard.html" : "talent-dashboard.html";
+  return (
+    <>
+      <SimpleHeader page="settings" role={isBusiness ? "business" : "talent"} />
+      <main className="wrap" style={{ paddingTop: 30, paddingBottom: 80, maxWidth: 760 }}>
+        <div className="dash-head" style={{ marginBottom: 6 }}>
+          <div>
+            <h1 className="dash-h1">Settings</h1>
+            <p className="dash-sub">Manage your profile, notifications and account security.</p>
+          </div>
+          <Button variant="secondary" href={dashHref}>Back to dashboard</Button>
+        </div>
+        <div className="dcol" style={{ marginTop: 26 }}>
+          <ProfileCard />
+          <NotificationsCard />
+          <SecurityCard />
+          <DangerZoneCard />
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+const __el = document.getElementById("root");
+(window.__twRoot = window.__twRoot || ReactDOM.createRoot(__el)).render(<SettingsPage />);
+</script>
+</body>
+</html>

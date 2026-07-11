@@ -125,6 +125,14 @@ function TwingoMark({ size = 28, wordmark = false, wordSize = 20, light = false 
   );
 }
 
+/* ---------- Small line icons (menu__item, ProfileMenu) ---------- */
+const IconIn = (props) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props} />;
+const IconUser = () => <IconIn><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" /></IconIn>;
+const IconGrid = () => <IconIn><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /></IconIn>;
+const IconSettings = () => <IconIn><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></IconIn>;
+const IconHelp = () => <IconIn><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></IconIn>;
+const IconLogout = () => <IconIn><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></IconIn>;
+
 /* ---------- Header ---------- */
 /* ---------- Auth modal (sign in / sign up) ---------- */
 const AuthGoogle = () => (
@@ -403,11 +411,12 @@ function ProfileMenu({ dashHref }) {
           </div>
         </div>
         <div className="menu__sep"></div>
-        <a href={"messages.html?as=" + (dashHref.startsWith("buyer") ? "business" : "talent")} className="menu__item" role="menuitem">Messages</a>
-        <a href={dashHref} className="menu__item" role="menuitem">Dashboard</a>
-        <a href={dashHref.startsWith("buyer") ? "my-briefs.html" : "profile-talent.html?id=mara"} className="menu__item" role="menuitem">{dashHref.startsWith("buyer") ? "My briefs" : "My public profile"}</a>
+        <a href={dashHref.startsWith("buyer") ? "my-briefs.html" : "profile-talent.html?id=mara"} className="menu__item" role="menuitem"><IconUser />View Profile</a>
+        <a href={dashHref} className="menu__item" role="menuitem"><IconGrid />Dashboard</a>
+        <a href="settings.html" className="menu__item" role="menuitem"><IconSettings />Settings</a>
+        <a href="help-support.html" className="menu__item" role="menuitem"><IconHelp />Help &amp; Support</a>
         <div className="menu__sep"></div>
-        <a href="talent-home.html" className="menu__item menu__item--danger" role="menuitem" onClick={() => setSignedIn(false)}>Sign out</a>
+        <a href="talent-home.html" className="menu__item menu__item--danger" role="menuitem" onClick={() => setSignedIn(false)}><IconLogout />Log out</a>
       </div>
     </div>
   );
