@@ -22,6 +22,17 @@
 <script type="text/babel" src="twingo-shared.jsx"></script>
 <script type="text/babel">
 const { Button, Badge, FilterChip } = window.TwingoDesignSystem_122db6;
+const TALENT_ID = "mara";
+const MARA_PHOTO = "https://randomuser.me/api/portraits/women/68.jpg";
+const TABS = ["Overview", "Profile", "Packages", "Offers", "Earnings"];
+const PKG_KEY = "twingo-pricing-mara-v2";
+const USAGE = ["One asset", "Up to 20 assets", "Unlimited assets"];
+const TERMS = ["Single use", "1 month", "3 months", "12 months"];
+const DEFAULT_PKGS = [
+  { id: 1, name: "Single use", blurb: "One approved AI asset", price: 380, usage: "One asset", term: "Single use", exclusive: false, popular: false, active: true, orders: 41, views: 486 },
+  { id: 2, name: "Campaign", blurb: "One campaign, up to 20 assets", price: 820, usage: "Up to 20 assets", term: "3 months", exclusive: false, popular: true, active: true, orders: 18, views: 291 },
+  { id: 3, name: "Category buyout", blurb: "Exclusive in your category", price: 2400, usage: "Unlimited assets", term: "12 months", exclusive: true, popular: false, active: false, orders: 3, views: 74 },
+];
 
 const CHIP = {
   live:   { color: "#7A5A00", background: "#FFF3C4" },
@@ -32,10 +43,451 @@ const CHIP = {
 function Chip({ tone = "muted", children }) {
   return <span className="dchip" style={CHIP[tone]}>{children}</span>;
 }
+function Toggle({ on, onClick }) {
+  return <span className={"tp-toggle" + (on ? " tp-toggle--on" : "")} onClick={onClick} role="switch" aria-checked={on}><span className="tp-toggle__track"><span className="tp-toggle__knob"></span></span></span>;
+}
+
+/* ================= Overview ================= */
+function TabOverview({ queue, licenses, revoke, setPreview, myApplications, goTab }) {
+  return (
+    <>
+      <div className="dstats" style={{ marginTop: 26 }}>
+        <div className="dstat dstat--dark">
+          <div className="dstat__k">Available balance</div>
+          <div className="dstat__n">$4,820</div>
+          <div className="dstat__f">Withdraw
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </div>
+        </div>
+        <div className="dstat">
+          <div className="dstat__k">Awaiting your approval</div>
+          <div className="dstat__n">{queue.length}</div>
+          <div className="dstat__f">Nothing goes live without you</div>
+        </div>
+        <div className="dstat">
+          <div className="dstat__k">Profile views · 30d</div>
+          <div className="dstat__n">812</div>
+          <div className="dstat__f dstat__f--lime">↑ 18% vs last month</div>
+        </div>
+        <div className="dstat">
+          <div className="dstat__k">Rating</div>
+          <div className="dstat__n">★ 4.9</div>
+          <div className="dstat__f">37 reviews</div>
+        </div>
+      </div>
+
+      <div className="dgrid">
+        <div className="dcol">
+          <div className="dpanel">
+            <div className="dpanel__head">
+              <h2 className="dpanel__title">Approval queue</h2>
+              {queue.length > 0 && <Badge tone="live" dot>{queue.length} waiting</Badge>}
+            </div>
+            <div className="dpanel__list">
+              {queue.length === 0 && <div style={{ padding: "18px 0", textAlign: "center" }} className="muted">All caught up — nothing waiting for approval.</div>}
+              {queue.map(a => (
+                <div key={a.id} className="drow">
+                  <span className="drow__logo" style={{ borderRadius: 14, backgroundImage: "url(" + MARA_PHOTO + ")" }}></span>
+                  <div className="drow__main">
+                    <div className="drow__t">{a.asset}</div>
+                    <div className="drow__m">{a.buyer} · {a.tier} · {a.when}</div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8, flex: "none" }}>
+                    <Button variant="secondary" size="sm" onClick={() => setPreview(a)}>View content</Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="dpanel">
+            <div className="dpanel__head">
+              <h2 className="dpanel__title">Active licenses</h2>
+              <button className="dpanel__link" style={{ background: "none", border: "none", cursor: "pointer" }} onClick={() => goTab("Packages")}>Manage packages</button>
+            </div>
+            <div className="dpanel__list">
+              {licenses.map(l => (
+                <div key={l.id} className="drow" style={{ opacity: l.live ? 1 : 0.55 }}>
+                  <span className="drow__logo" style={{ background: "linear-gradient(135deg,#1C212B,#5A5B60)" }}>{l.buyer.split(" ").map(w => w[0]).join("").slice(0,2)}</span>
+                  <div className="drow__main">
+                    <div className="drow__t">{l.buyer}</div>
+                    <div className="drow__m">{l.tier} · {l.uses} approved uses</div>
+                  </div>
+                  <div className="drow__amt">${l.price}</div>
+                  {l.live
+                    ? <Button variant="secondary" size="sm" onClick={() => revoke(l.id)}>Revoke</Button>
+                    : <Chip tone="muted">Revoked</Chip>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="dpanel">
+            <div className="dpanel__head">
+              <h2 className="dpanel__title">Your applications</h2>
+              <a className="dpanel__link" href="browse-briefs.html">Browse briefs</a>
+            </div>
+            <div className="dpanel__list">
+              {myApplications.length === 0 && <div style={{ padding: "18px 0", textAlign: "center" }} className="muted">No applications yet — browse open briefs to apply.</div>}
+              {myApplications.map(a => (
+                <div key={a.id} className="drow">
+                  <span className="drow__logo" style={{ background: "linear-gradient(135deg,#1C212B,#5A5B60)" }}>{a.company.slice(0, 2).toUpperCase()}</span>
+                  <div className="drow__main">
+                    <div className="drow__t">{a.briefTitle}</div>
+                    <div className="drow__m">{a.company} · ${a.price} · {a.when}</div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8, flex: "none" }}>
+                    <Button variant="secondary" size="sm" href={"messages.html?with=" + a.briefId}>Message</Button>
+                    <Chip tone="live">Pending</Chip>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="dcol">
+          <div className="dpanel">
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+              <h2 className="dpanel__title">Profile strength</h2>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 18 }}>85%</span>
+            </div>
+            <div className="dbar"><span style={{ width: "85%" }} /></div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 11, marginTop: 18 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13.5, color: "var(--text-secondary)" }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4B7A1E" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ flex: "none" }}><path d="M20 6 9 17l-5-5"/></svg>
+                <s style={{ color: "var(--text-tertiary)" }}>Identity verified with signed consent</s>
+              </div>
+              <button style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13.5, color: "var(--ink)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }} onClick={() => goTab("Packages")}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" strokeWidth="1.9" style={{ flex: "none" }}><circle cx="12" cy="12" r="9"/></svg>Add a third package
+              </button>
+              <button style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13.5, color: "var(--ink)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }} onClick={() => goTab("Profile")}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" strokeWidth="1.9" style={{ flex: "none" }}><circle cx="12" cy="12" r="9"/></svg>Add 2 more work samples
+              </button>
+            </div>
+          </div>
+
+          <div className="dpanel dpanel--tint">
+            <div className="dstat__k">Latest review</div>
+            <div style={{ fontSize: 15, fontWeight: 700, marginTop: 10 }}>★★★★★ 5.0</div>
+            <p style={{ fontSize: 14, lineHeight: 1.55, color: "var(--ink)", margin: "8px 0 0" }}>“Approved every asset in hours and the likeness was flawless — total pro to work with.”</p>
+            <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 10 }}>Aperture AI · Brand lead</div>
+          </div>
+
+          <div className="dpanel">
+            <div className="dstat__k">Your controls</div>
+            <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
+              {[
+                { t: "Pause new licenses", d: "Stay listed, stop new deals" },
+                { t: "Edit usage terms", d: "Update tiers & blackout categories" },
+                { t: "Revoke all & unpublish", d: "Pull your twin entirely", danger: true },
+              ].map((c, i) => (
+                <button key={i} style={{ textAlign: "left", background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "12px 14px", cursor: "pointer" }}>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: c.danger ? "var(--vermilion)" : "var(--ink)" }}>{c.t}</div>
+                  <div className="meta">{c.d}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ================= Profile ================= */
+function UploadSlot({ item, onRemove }) {
+  return (
+    <div style={{ position: "relative", borderRadius: 12, overflow: "hidden", aspectRatio: "1", border: "1px solid var(--border)", background: "var(--surface-subtle)" }}>
+      {item.type === "video"
+        ? <video src={item.src} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} muted />
+        : <img src={item.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />}
+      <button onClick={onRemove} aria-label="Remove" style={{ position: "absolute", top: 6, right: 6, width: 24, height: 24, borderRadius: "50%", background: "rgba(13,10,10,0.66)", color: "#fff", border: "none", cursor: "pointer", fontSize: 14, lineHeight: 1 }}>×</button>
+      {item.type === "video" && <span style={{ position: "absolute", bottom: 6, left: 6, background: "rgba(13,10,10,0.66)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 7px", borderRadius: 999 }}>VIDEO</span>}
+    </div>
+  );
+}
+function ContentUploadCard() {
+  const portfolio = usePortfolio(TALENT_ID);
+  const fileRef = React.useRef(null);
+  const onPick = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const isVideo = file.type.startsWith("video/");
+    const reader = new FileReader();
+    reader.onload = () => addPortfolioItem(TALENT_ID, { src: reader.result, type: isVideo ? "video" : "photo", name: file.name });
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+  return (
+    <div className="card" style={{ padding: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+        <h3 className="h3" style={{ fontSize: 16 }}>Your content</h3>
+        <span className="meta">{portfolio.length} uploaded</span>
+      </div>
+      <p className="muted" style={{ fontSize: 13, marginTop: 6 }}>Upload photos and videos of your work — these appear on your public profile.</p>
+      <input ref={fileRef} type="file" accept="image/*,video/*" style={{ display: "none" }} onChange={onPick} />
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginTop: 14 }}>
+        {portfolio.map(item => <UploadSlot key={item.id} item={item} onRemove={() => removePortfolioItem(TALENT_ID, item.id)} />)}
+        <button onClick={() => fileRef.current && fileRef.current.click()} style={{ aspectRatio: "1", borderRadius: 12, border: "1px dashed var(--border-strong)", background: "none", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, cursor: "pointer", color: "var(--text-secondary)" }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          <span style={{ fontSize: 12, fontWeight: 600 }}>Add photo/video</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+function TabProfile() {
+  const [skills, setSkills] = React.useState(["Commercial", "Branded Content", "Social Media / Reels", "Film"]);
+  const [skillDraft, setSkillDraft] = React.useState("");
+  const [avail, setAvail] = React.useState(true);
+  const addSkill = (e) => {
+    if (e.key !== "Enter" || !skillDraft.trim()) return;
+    setSkills(s => [...s, skillDraft.trim()]); setSkillDraft("");
+  };
+  return (
+    <div className="dgrid">
+      <div className="card" style={{ padding: 24 }}>
+        <h2 className="h3" style={{ marginBottom: 20 }}>Edit profile</h2>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 22 }}>
+          <img src={MARA_PHOTO} alt="" style={{ width: 64, height: 64, borderRadius: 999, objectFit: "cover" }} />
+          <Button variant="secondary" size="sm">Change photo</Button>
+          <span className="meta">JPG or PNG, at least 400×400</span>
+        </div>
+        <div className="hub-row2">
+          <label className="hub-field"><span className="hub-field__l">Display name</span><input defaultValue="Mara Voss" /></label>
+          <label className="hub-field"><span className="hub-field__l">Location</span><input defaultValue="Los Angeles, CA" /></label>
+        </div>
+        <label className="hub-field"><span className="hub-field__l">Headline</span><input defaultValue="Commercial & branded content AI twin, licensed for campaigns" /></label>
+        <label className="hub-field"><span className="hub-field__l">Bio</span>
+          <textarea defaultValue="I license my likeness as a verified AI twin for commercial and branded content. Every use is approved by me before it goes live." />
+        </label>
+
+        <div className="hub-field">
+          <span className="hub-field__l">Content categories</span>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 2 }}>
+            {skills.map((s, i) => (
+              <span key={s} className="hub-tag">{s}<button onClick={() => setSkills(list => list.filter((_, j) => j !== i))} aria-label={"Remove " + s}>×</button></span>
+            ))}
+            <input className="hub-tag-add" placeholder="Add category + Enter" value={skillDraft} onChange={e => setSkillDraft(e.target.value)} onKeyDown={addSkill} />
+          </div>
+        </div>
+
+        <hr className="rule" style={{ margin: "22px 0" }} />
+
+        <div className="hub-field">
+          <span className="hub-field__l">Blackout categories — never allowed</span>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 2 }}>
+            {["Political", "Adult", "Gambling", "Medical claims", "Crypto", "Alcohol", "Weapons"].map(c => (
+              <FilterChip key={c} active={["Political", "Adult", "Medical claims"].includes(c)}>{c}</FilterChip>
+            ))}
+          </div>
+        </div>
+
+        <Button variant="primary" style={{ marginTop: 6, background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Save changes</Button>
+      </div>
+
+      <div className="dcol">
+        <ContentUploadCard />
+
+        <div className="card hub-avail" style={{ padding: 20 }}>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 14.5 }}>Available for licensing</div>
+            <div className="meta" style={{ marginTop: 3, maxWidth: 220 }}>Shown as available on Browse and search</div>
+          </div>
+          <Toggle on={avail} onClick={() => setAvail(v => !v)} />
+        </div>
+
+        <div className="hub-verify">
+          <div className="hub-verify__h">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            TWINGO VERIFIED
+          </div>
+          <p className="hub-verify__p">Your identity and consent are verified. Verified profiles get 2.4× more offers.</p>
+          <a className="hub-verify__link" href="#">Manage verification</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ================= Packages ================= */
+function TabPackages({ pkgs, setPkgs }) {
+  const [editing, setEditing] = React.useState(null);
+  const toggleActive = (id) => setPkgs(list => list.map(p => p.id === id ? { ...p, active: !p.active } : p));
+  const add = () => {
+    const id = Date.now();
+    setPkgs(list => [...list, { id, name: "New package", blurb: "Describe what's included", price: 500, usage: "One asset", term: "Single use", exclusive: false, popular: false, active: true, orders: 0, views: 0 }]);
+    setEditing(id);
+  };
+  const change = (p) => setPkgs(list => list.map(x => x.id === p.id ? p : x));
+  const remove = (id) => { setPkgs(list => list.filter(x => x.id !== id)); setEditing(null); };
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+        <h2 className="h3">Your packages</h2>
+        <Button variant="primary" size="sm" onClick={add} style={{ background: "var(--ink)", color: "#fff" }}>+ New package</Button>
+      </div>
+      <div style={{ display: "grid", gap: 12 }}>
+        {pkgs.map(pk => (
+          <div key={pk.id} className="card">
+            <div className="hub-pkg">
+              <div className="hub-pkg__main">
+                <div className="hub-pkg__name">{pk.name} <Badge tone={pk.active ? "live" : "muted"} dot>{pk.active ? "Active" : "Paused"}</Badge>{pk.popular && <Badge tone="paid">Popular</Badge>}</div>
+                <div className="hub-pkg__meta">From ${pk.price} · {pk.usage} · {pk.term}{pk.exclusive ? " · exclusive" : ""}</div>
+              </div>
+              <div className="hub-pkg__stats">
+                <div className="hub-pkg__stat"><div className="hub-pkg__stat-l">Orders</div><div className="hub-pkg__stat-n">{pk.orders}</div></div>
+                <div className="hub-pkg__stat"><div className="hub-pkg__stat-l">Views · 30d</div><div className="hub-pkg__stat-n">{pk.views}</div></div>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <Button variant="secondary" size="sm" onClick={() => setEditing(editing === pk.id ? null : pk.id)}>{editing === pk.id ? "Close" : "Edit"}</Button>
+                <Button variant="secondary" size="sm" onClick={() => toggleActive(pk.id)}>{pk.active ? "Pause" : "Activate"}</Button>
+              </div>
+            </div>
+            {editing === pk.id && (
+              <div style={{ padding: "0 18px 18px" }}>
+                <hr className="rule" style={{ marginBottom: 18 }} />
+                <div className="hub-row2">
+                  <label className="hub-field"><span className="hub-field__l">Name</span><input value={pk.name} onChange={e => change({ ...pk, name: e.target.value })} /></label>
+                  <label className="hub-field"><span className="hub-field__l">Price ($)</span><input type="number" value={pk.price} onChange={e => change({ ...pk, price: +e.target.value || 0 })} /></label>
+                </div>
+                <label className="hub-field"><span className="hub-field__l">Description</span><input value={pk.blurb} onChange={e => change({ ...pk, blurb: e.target.value })} /></label>
+                <div className="hub-row2">
+                  <label className="hub-field"><span className="hub-field__l">Usage</span>
+                    <select className="brief__select" style={{ width: "100%" }} value={pk.usage} onChange={e => change({ ...pk, usage: e.target.value })}>
+                      {USAGE.map(u => <option key={u}>{u}</option>)}
+                    </select>
+                  </label>
+                  <label className="hub-field"><span className="hub-field__l">Term</span>
+                    <select className="brief__select" style={{ width: "100%" }} value={pk.term} onChange={e => change({ ...pk, term: e.target.value })}>
+                      {TERMS.map(t => <option key={t}>{t}</option>)}
+                    </select>
+                  </label>
+                </div>
+                <div className="tp-switches">
+                  <button type="button" className={"tp-toggle" + (pk.exclusive ? " tp-toggle--on" : "")} onClick={() => change({ ...pk, exclusive: !pk.exclusive })}><span className="tp-toggle__track"><span className="tp-toggle__knob"></span></span>Category exclusive</button>
+                  <button type="button" className={"tp-toggle" + (pk.popular ? " tp-toggle--on" : "")} onClick={() => setPkgs(list => list.map(x => ({ ...x, popular: x.id === pk.id ? !x.popular : false })))}><span className="tp-toggle__track"><span className="tp-toggle__knob"></span></span>Mark as popular</button>
+                </div>
+                <button className="mkt-clear-all" style={{ marginTop: 16 }} onClick={() => remove(pk.id)}>Remove package</button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ================= Offers ================= */
+function TabOffers({ offers, updateOffer }) {
+  const statusBadge = (s) => s === "new" ? <Badge tone="live" dot>New offer</Badge> : s === "accepted" ? <Badge tone="paid">Accepted</Badge> : s === "declined" ? <Badge tone="muted">Declined</Badge> : null;
+  return (
+    <div style={{ display: "grid", gap: 12 }}>
+      {offers.map(o => (
+        <div key={o.id} className="card hub-offer">
+          <div className="hub-offer__top">
+            <span className="hub-offer__ava">{o.initials}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="hub-offer__title">{o.title} {statusBadge(o.status)}</div>
+              <div className="hub-offer__meta">{o.brand} · {o.meta}</div>
+            </div>
+            <div className="hub-offer__price">
+              <div className="hub-offer__price-n">${o.price}</div>
+              <div className="hub-offer__price-s">{o.priceSub}</div>
+            </div>
+          </div>
+          <p className="hub-offer__desc">{o.desc}</p>
+          {o.status === "new" && (
+            <div className="hub-offer__actions">
+              <Button variant="primary" size="sm" onClick={() => updateOffer(o.id, { status: "accepted" })} style={{ background: "var(--ink)", color: "#fff" }}>Accept offer</Button>
+              <Button variant="secondary" size="sm" href={"messages.html?with=" + o.id}>Message</Button>
+              <button className="mkt-clear-all" onClick={() => updateOffer(o.id, { status: "declined" })}>Decline</button>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ================= Earnings ================= */
+function TabEarnings() {
+  const months = [
+    { l: "Jan", v: 4.2 }, { l: "Feb", v: 5.9 }, { l: "Mar", v: 3.4 },
+    { l: "Apr", v: 7.8 }, { l: "May", v: 6.3 }, { l: "Jun", v: 8.3 },
+  ];
+  const max = Math.max(...months.map(m => m.v));
+  const txns = [
+    { t: "Vertical series · North Cut", m: "Order payment", status: "cleared", amt: 1900, pos: true, w: "Jul 2" },
+    { t: "Withdrawal to bank ····4501", m: "Payout", status: "sent", amt: 5000, pos: false, w: "Jun 28" },
+    { t: "Launch film · Vontélle Studio", m: "Escrow release", status: "cleared", amt: 2640, pos: true, w: "Jun 24" },
+    { t: "Motion package · Studio Maru", m: "Order payment", status: "cleared", amt: 3200, pos: true, w: "Jun 18" },
+    { t: "Atlas rebrand deposit", m: "Escrow (held)", status: "held", amt: 1600, pos: true, w: "Jun 10" },
+    { t: "Withdrawal to bank ····4501", m: "Payout", status: "sent", amt: 4200, pos: false, w: "May 30" },
+  ];
+  const statusTone = { cleared: "paid", sent: "muted", held: "live" };
+  return (
+    <div>
+      <div className="hub-stats3">
+        <div className="dstat dstat--dark">
+          <div className="dstat__k">Available balance</div>
+          <div className="dstat__n">$4,820</div>
+          <div className="dstat__f">Withdraw
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </div>
+        </div>
+        <div className="dstat">
+          <div className="dstat__k">In escrow</div>
+          <div className="dstat__n">$2,400</div>
+          <div className="dstat__f">Releases when "Neon Harbor" delivers</div>
+        </div>
+        <div className="dstat">
+          <div className="dstat__k">Earned in 2026</div>
+          <div className="dstat__n">$38,150</div>
+          <div className="dstat__f dstat__f--lime">↑ 31% vs same period last year</div>
+        </div>
+      </div>
+
+      <div className="dgrid dgrid--earnings">
+        <div className="dpanel">
+          <h2 className="dpanel__title">Earnings by month</h2>
+          <div className="hub-chart">
+            {months.map((m, i) => (
+              <div key={m.l} className="hub-chart__col">
+                <span className="hub-chart__n">${m.v}k</span>
+                <div className={"hub-chart__bar" + (i === months.length - 1 ? " hub-chart__bar--now" : "")} style={{ height: (m.v / max * 100) + "%" }}></div>
+                <span className="hub-chart__lbl">{m.l}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="dpanel">
+          <h2 className="dpanel__title">Transactions</h2>
+          <div style={{ marginTop: 4 }}>
+            {txns.map((t, i) => (
+              <div key={i} className="hub-txn">
+                <div className="hub-txn__main">
+                  <div className="hub-txn__t">{t.t}</div>
+                  <div className="hub-txn__m">{t.w} · {t.m}</div>
+                </div>
+                <Badge tone={statusTone[t.status]}>{t.status[0].toUpperCase() + t.status.slice(1)}</Badge>
+                <span className={"hub-txn__amt " + (t.pos ? "hub-txn__amt--pos" : "hub-txn__amt--neg")}>{t.pos ? "+" : "−"}${t.amt.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function TalentDash() {
   React.useEffect(() => { setRole("talent"); }, []);
-  const TALENT_ID = "mara";
+  const params = new URLSearchParams(location.search);
+  const initialTab = TABS.find(t => t.toLowerCase() === (params.get("tab") || "").toLowerCase()) || "Overview";
+  const [tab, setTab] = React.useState(initialTab);
 
   const DEFAULT_SUBS = [
     { id: 1, talentId: TALENT_ID, buyer: "Aperture AI", asset: "Skincare hero — variant 3", description: "Product hero still for our spring skincare launch — twin holding the serum bottle, soft studio lighting, no text overlay.", tier: "Campaign", when: "2h ago", status: "pending" },
@@ -51,18 +503,21 @@ function TalentDash() {
     { id: 2, buyer: "Halo Labs", tier: "Monthly", price: 380, uses: 8, live: true },
     { id: 3, buyer: "Studio Kōan", tier: "Single use", price: 380, uses: 3, live: true },
   ]);
+  const [pkgs, setPkgs] = React.useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PKG_KEY));
+      if (Array.isArray(saved) && saved.length && saved.every(p => typeof p.orders === "number")) return saved;
+    } catch (e) {}
+    return DEFAULT_PKGS;
+  });
+  React.useEffect(() => { try { localStorage.setItem(PKG_KEY, JSON.stringify(pkgs)); } catch (e) {} }, [pkgs]);
+  const [offers, updateOffer] = useOffers(DEFAULT_OFFERS);
+  const myOffers = offers.filter(o => o.talentId === TALENT_ID);
+  const pendingOffers = myOffers.filter(o => o.status === "new").length;
 
-  const MARA_PHOTO = "https://randomuser.me/api/portraits/women/68.jpg";
   const [preview, setPreview] = React.useState(null);
   const decide = (id, approved) => { updateSub(id, { status: approved ? "approved" : "declined" }); setPreview(null); };
   const revoke = (id) => setLicenses(l => l.map(x => x.id === id ? { ...x, live: false } : x));
-
-  const log = [
-    { t: "Aperture AI published an approved skincare still", c: "var(--success)", w: "3h ago" },
-    { t: "You approved Northwind's reel cut", c: "var(--ink)", w: "6h ago" },
-    { t: "Payout of $1,740 sent to your account", c: "var(--success)", w: "2d ago" },
-    { t: "You revoked Vellum's exclusive request", c: "var(--vermilion)", w: "4d ago" },
-  ];
 
   return (
     <>
@@ -87,7 +542,6 @@ function TalentDash() {
       </div>
 
       <main className="wrap" style={{ paddingTop: 34, paddingBottom: 80 }}>
-        {/* Greeting */}
         <div className="dash-head">
           <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
             <span style={{ width: 52, height: 52, borderRadius: 999, flex: "none", background: "center/cover no-repeat url(" + MARA_PHOTO + ")" }}></span>
@@ -102,162 +556,19 @@ function TalentDash() {
         </div>
 
         <div className="hub-tabs" style={{ marginTop: 22, marginBottom: 6 }}>
-          <button className="hub-tab hub-tab--on">Overview</button>
-          <a className="hub-tab" href="talent-pricing.html?tab=profile">Profile</a>
-          <a className="hub-tab" href="talent-pricing.html?tab=packages">Packages</a>
-          <a className="hub-tab" href="talent-pricing.html?tab=offers">Offers{queue.length > 0 && <span className="hub-tab__badge">{queue.length}</span>}</a>
-          <a className="hub-tab" href="talent-pricing.html?tab=earnings">Earnings</a>
+          {TABS.map(t => (
+            <button key={t} className={"hub-tab" + (tab === t ? " hub-tab--on" : "")} onClick={() => setTab(t)}>
+              {t}{t === "Offers" && pendingOffers > 0 && <span className="hub-tab__badge">{pendingOffers}</span>}
+            </button>
+          ))}
         </div>
 
-        {/* Stats */}
-        <div className="dstats" style={{ marginTop: 26 }}>
-          <div className="dstat dstat--dark">
-            <div className="dstat__k">Available balance</div>
-            <div className="dstat__n">$4,820</div>
-            <div className="dstat__f">Withdraw
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </div>
-          </div>
-          <div className="dstat">
-            <div className="dstat__k">Awaiting your approval</div>
-            <div className="dstat__n">{queue.length}</div>
-            <div className="dstat__f">Nothing goes live without you</div>
-          </div>
-          <div className="dstat">
-            <div className="dstat__k">Profile views · 30d</div>
-            <div className="dstat__n">812</div>
-            <div className="dstat__f dstat__f--lime">↑ 18% vs last month</div>
-          </div>
-          <div className="dstat">
-            <div className="dstat__k">Rating</div>
-            <div className="dstat__n">★ 4.9</div>
-            <div className="dstat__f">37 reviews</div>
-          </div>
-        </div>
-
-        <div className="dgrid">
-          {/* Left column */}
-          <div className="dcol">
-            {/* Approval queue */}
-            <div className="dpanel">
-              <div className="dpanel__head">
-                <h2 className="dpanel__title">Approval queue</h2>
-                {queue.length > 0 && <Badge tone="live" dot>{queue.length} waiting</Badge>}
-              </div>
-              <div className="dpanel__list">
-                {queue.length === 0 && <div style={{ padding: "18px 0", textAlign: "center" }} className="muted">All caught up — nothing waiting for approval.</div>}
-                {queue.map(a => (
-                  <div key={a.id} className="drow">
-                    <span className="drow__logo" style={{ borderRadius: 14, backgroundImage: "url(" + MARA_PHOTO + ")" }}></span>
-                    <div className="drow__main">
-                      <div className="drow__t">{a.asset}</div>
-                      <div className="drow__m">{a.buyer} · {a.tier} · {a.when}</div>
-                    </div>
-                    <div style={{ display: "flex", gap: 8, flex: "none" }}>
-                      <Button variant="secondary" size="sm" onClick={() => setPreview(a)}>View content</Button>
-                      <Button variant="lime" size="sm" onClick={() => decide(a.id, true)}>Approve</Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Active licenses */}
-            <div className="dpanel">
-              <div className="dpanel__head">
-                <h2 className="dpanel__title">Active licenses</h2>
-                <a className="dpanel__link" href="talent-pricing.html?tab=packages">Manage packages</a>
-              </div>
-              <div className="dpanel__list">
-                {licenses.map(l => (
-                  <div key={l.id} className="drow" style={{ opacity: l.live ? 1 : 0.55 }}>
-                    <span className="drow__logo" style={{ background: "linear-gradient(135deg,#1C212B,#5A5B60)" }}>{l.buyer.split(" ").map(w => w[0]).join("").slice(0,2)}</span>
-                    <div className="drow__main">
-                      <div className="drow__t">{l.buyer}</div>
-                      <div className="drow__m">{l.tier} · {l.uses} approved uses</div>
-                    </div>
-                    <div className="drow__amt">${l.price}</div>
-                    {l.live
-                      ? <Button variant="secondary" size="sm" onClick={() => revoke(l.id)}>Revoke</Button>
-                      : <Chip tone="muted">Revoked</Chip>}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Your applications */}
-            <div className="dpanel">
-              <div className="dpanel__head">
-                <h2 className="dpanel__title">Your applications</h2>
-                <a className="dpanel__link" href="browse-briefs.html">Browse briefs</a>
-              </div>
-              <div className="dpanel__list">
-                {myApplications.length === 0 && <div style={{ padding: "18px 0", textAlign: "center" }} className="muted">No applications yet — browse open briefs to apply.</div>}
-                {myApplications.map(a => (
-                  <div key={a.id} className="drow">
-                    <span className="drow__logo" style={{ background: "linear-gradient(135deg,#1C212B,#5A5B60)" }}>{a.company.slice(0, 2).toUpperCase()}</span>
-                    <div className="drow__main">
-                      <div className="drow__t">{a.briefTitle}</div>
-                      <div className="drow__m">{a.company} · ${a.price} · {a.when}</div>
-                    </div>
-                    <div style={{ display: "flex", gap: 8, flex: "none" }}>
-                      <Button variant="secondary" size="sm" href={"messages.html?with=" + a.briefId}>Message</Button>
-                      <Chip tone="live">Pending</Chip>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Right column */}
-          <div className="dcol">
-            {/* Profile strength */}
-            <div className="dpanel">
-              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-                <h2 className="dpanel__title">Profile strength</h2>
-                <span style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 18 }}>85%</span>
-              </div>
-              <div className="dbar"><span style={{ width: "85%" }} /></div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 11, marginTop: 18 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13.5, color: "var(--text-secondary)" }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4B7A1E" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ flex: "none" }}><path d="M20 6 9 17l-5-5"/></svg>
-                  <s style={{ color: "var(--text-tertiary)" }}>Identity verified with signed consent</s>
-                </div>
-                <a href="talent-pricing.html?tab=packages" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13.5, color: "var(--ink)", fontWeight: 600 }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" strokeWidth="1.9" style={{ flex: "none" }}><circle cx="12" cy="12" r="9"/></svg>Add a third package
-                </a>
-                <a href="profile-talent.html?id=mara" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13.5, color: "var(--ink)", fontWeight: 600 }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" strokeWidth="1.9" style={{ flex: "none" }}><circle cx="12" cy="12" r="9"/></svg>Add 2 more sample uses
-                </a>
-              </div>
-            </div>
-
-            {/* Latest review */}
-            <div className="dpanel dpanel--tint">
-              <div className="dstat__k">Latest review</div>
-              <div style={{ fontSize: 15, fontWeight: 700, marginTop: 10 }}>★★★★★ 5.0</div>
-              <p style={{ fontSize: 14, lineHeight: 1.55, color: "var(--ink)", margin: "8px 0 0" }}>“Approved every asset in hours and the likeness was flawless — total pro to work with.”</p>
-              <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 10 }}>Aperture AI · Brand lead</div>
-            </div>
-
-            {/* Controls */}
-            <div className="dpanel">
-              <div className="dstat__k">Your controls</div>
-              <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
-                {[
-                  { t: "Pause new licenses", d: "Stay listed, stop new deals" },
-                  { t: "Edit usage terms", d: "Update tiers & blackout categories" },
-                  { t: "Revoke all & unpublish", d: "Pull your twin entirely", danger: true },
-                ].map((c, i) => (
-                  <button key={i} style={{ textAlign: "left", background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "12px 14px", cursor: "pointer" }}>
-                    <div style={{ fontWeight: 600, fontSize: 14, color: c.danger ? "var(--vermilion)" : "var(--ink)" }}>{c.t}</div>
-                    <div className="meta">{c.d}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+        <div style={{ marginTop: 6 }}>
+          {tab === "Overview" && <TabOverview queue={queue} licenses={licenses} revoke={revoke} setPreview={setPreview} myApplications={myApplications} goTab={setTab} />}
+          {tab === "Profile" && <TabProfile />}
+          {tab === "Packages" && <TabPackages pkgs={pkgs} setPkgs={setPkgs} />}
+          {tab === "Offers" && <TabOffers offers={myOffers} updateOffer={updateOffer} />}
+          {tab === "Earnings" && <TabEarnings />}
         </div>
       </main>
       <Footer />

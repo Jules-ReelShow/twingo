@@ -22,6 +22,7 @@
 <script type="text/babel" src="twingo-shared.jsx"></script>
 <script type="text/babel">
 const { Button, Badge, FilterChip, Input } = window.TwingoDesignSystem_122db6;
+const TABS = ["Overview", "Proposals & offers", "Billing"];
 
 const CHIP = {
   active: { color: "#4B7A1E", background: "#EEF9DC" },
@@ -36,9 +37,237 @@ function Avatar({ inf, size = 44, radius = 14 }) {
   return <span className="drow__logo" style={{ width: size, height: size, borderRadius: radius, background: inf.photo ? `center/cover no-repeat url(${inf.photo})` : "linear-gradient(135deg,#1C212B,#5A5B60)" }}>{inf.photo ? "" : inf.name.split(" ").map(w => w[0]).join("").slice(0,2)}</span>;
 }
 
+/* ================= Overview ================= */
+function TabOverview({ licenses, approvals, setSubmitFor }) {
+  return (
+    <>
+      <div className="dstats" style={{ marginTop: 26 }}>
+        <div className="dstat dstat--dark">
+          <div className="dstat__k">Spent in 2026</div>
+          <div className="dstat__n">${licenses.reduce((sum, l) => sum + l.spent, 0).toLocaleString()}</div>
+          <div className="dstat__f">Across {licenses.length} licenses</div>
+        </div>
+        <div className="dstat">
+          <div className="dstat__k">Active licenses</div>
+          <div className="dstat__n">2</div>
+          <div className="dstat__f">1 pending at checkout</div>
+        </div>
+        <div className="dstat">
+          <div className="dstat__k">Awaiting approval</div>
+          <div className="dstat__n">{approvals.filter(s => s.status === "pending").length}</div>
+          <div className="dstat__f">Talent reviewing</div>
+        </div>
+      </div>
+
+      <div className="dgrid">
+        <div className="dcol">
+          <div className="dpanel">
+            <div className="dpanel__head">
+              <h2 className="dpanel__title">Your licenses</h2>
+              <a className="dpanel__link" href="browse-twins.html">Browse twins</a>
+            </div>
+            <div className="dpanel__list">
+              {licenses.map((l, i) => (
+                <div key={i} className="drow">
+                  <Avatar inf={l.inf} />
+                  <div className="drow__main">
+                    <div className="drow__t">{l.inf.name}</div>
+                    <div className="drow__m">{l.tier} · {l.channel}</div>
+                  </div>
+                  <div className="drow__amt">${l.spent.toLocaleString()}<span className="muted" style={{ fontWeight: 400 }}> spent</span></div>
+                  <button onClick={() => setSubmitFor(l)} style={{ padding: "9px 16px", border: "1px solid var(--border-strong)", borderRadius: 999, fontSize: 13, fontWeight: 700, flex: "none", background: "var(--card-bg)", cursor: "pointer" }}>Submit content</button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="dpanel">
+            <div className="dpanel__head">
+              <h2 className="dpanel__title">Approval queue</h2>
+              <span className="dstat__k">Talent signs off before publish</span>
+            </div>
+            <div className="dpanel__list">
+              {approvals.map((a, i) => (
+                <div key={i} className="drow">
+                  <Avatar inf={INFLUENCERS.find(x => x.id === a.talentId) || INFLUENCERS[0]} />
+                  <div className="drow__main">
+                    <div className="drow__t">{a.asset}</div>
+                    <div className="drow__m">{(INFLUENCERS.find(x => x.id === a.talentId) || {}).name} · {a.status === "pending" ? "Awaiting talent approval" : a.status === "approved" ? "Approved · ready to publish" : "Declined by talent"}</div>
+                  </div>
+                  {a.status === "approved"
+                    ? <Chip tone="active">Approved</Chip>
+                    : a.status === "declined"
+                      ? <Chip tone="muted">Declined</Chip>
+                      : <Chip tone="pending">In review</Chip>}
+                </div>
+              ))}
+              {approvals.length === 0 && <div style={{ padding: "18px 0", textAlign: "center" }} className="muted">Nothing submitted yet — submit content from a license above.</div>}
+            </div>
+          </div>
+        </div>
+
+        <div className="dcol">
+          <div className="dpanel dpanel--tint">
+            <div className="dpanel__head">
+              <h2 className="dpanel__title" style={{ fontSize: 16 }}>Recommended twins</h2>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", marginTop: 6 }}>
+              {INFLUENCERS.slice(8, 11).map(inf => (
+                <a key={inf.id} href={"profile-business.html?id=" + inf.id} className="dside-row">
+                  <Avatar inf={inf} size={34} radius={11} />
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ display: "block", fontSize: 13.5, fontWeight: 600 }}>{inf.name}</span>
+                    <span style={{ display: "block", fontSize: 12, color: "var(--text-tertiary)" }}>{inf.niche} · {inf.followers}</span>
+                  </span>
+                  <span style={{ fontSize: 12.5, fontWeight: 700, flex: "none" }}>${inf.rate}</span>
+                </a>
+              ))}
+            </div>
+            <a href="browse-twins.html" style={{ display: "inline-block", fontSize: 13, fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 2, marginTop: 14 }}>Browse more twins</a>
+          </div>
+
+          <div className="dpanel dpanel--dark">
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#B4FF6A" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+              Consent-protected
+            </div>
+            <p style={{ fontSize: 13.5, lineHeight: 1.55, color: "rgba(255,255,255,0.8)", margin: "10px 0 0" }}>Your payment is held securely and only releases once the talent approves each use. Nothing goes live without their sign-off.</p>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ================= Proposals & offers ================= */
+function ReviseOfferRow({ o, updateOffer }) {
+  const [revising, setRevising] = React.useState(false);
+  const [price, setPrice] = React.useState(o.price);
+  const [note, setNote] = React.useState("");
+  const statusBadge = (s) => s === "new" ? <Badge tone="live" dot>Pending</Badge> : s === "accepted" ? <Badge tone="paid">Accepted</Badge> : s === "declined" ? <Badge tone="muted">Declined</Badge> : null;
+  const save = () => {
+    updateOffer(o.id, { price: Number(price) || o.price, desc: note.trim() ? o.desc + " (Revised: " + note.trim() + ")" : o.desc });
+    setRevising(false); setNote("");
+  };
+  return (
+    <div className="card hub-offer">
+      <div className="hub-offer__top">
+        <span className="hub-offer__ava">{o.initials}</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="hub-offer__title">{o.title} {statusBadge(o.status)}</div>
+          <div className="hub-offer__meta">To Mara Voss · {o.meta}</div>
+        </div>
+        <div className="hub-offer__price">
+          <div className="hub-offer__price-n">${o.price}</div>
+          <div className="hub-offer__price-s">{o.priceSub}</div>
+        </div>
+      </div>
+      <p className="hub-offer__desc">{o.desc}</p>
+      {o.status === "new" && !revising && (
+        <div className="hub-offer__actions">
+          <Button variant="secondary" size="sm" onClick={() => { setPrice(o.price); setRevising(true); }}>Revise offer</Button>
+          <Button variant="secondary" size="sm" href={"messages.html?as=business&with=mara"}>Message talent</Button>
+        </div>
+      )}
+      {revising && (
+        <div style={{ padding: "0 18px 18px" }}>
+          <hr className="rule" style={{ marginBottom: 16 }} />
+          <div className="hub-row2">
+            <label className="hub-field"><span className="hub-field__l">New price ($)</span><input type="number" value={price} onChange={e => setPrice(e.target.value)} /></label>
+            <label className="hub-field"><span className="hub-field__l">Note to talent (optional)</span><input value={note} onChange={e => setNote(e.target.value)} placeholder="e.g. Extended usage window" /></label>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Button variant="primary" size="sm" onClick={save} style={{ background: "var(--ink)", color: "#fff" }}>Save revision</Button>
+            <Button variant="secondary" size="sm" onClick={() => setRevising(false)}>Cancel</Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+function TabProposals({ offers, updateOffer, applications }) {
+  return (
+    <div>
+      <h2 className="h3" style={{ marginBottom: 14 }}>Offers you've sent</h2>
+      <div style={{ display: "grid", gap: 12, marginBottom: 34 }}>
+        {offers.map(o => <ReviseOfferRow key={o.id} o={o} updateOffer={updateOffer} />)}
+        {offers.length === 0 && <div className="card muted" style={{ padding: 24, textAlign: "center" }}>No offers sent yet — license a twin's package from their profile.</div>}
+      </div>
+
+      <h2 className="h3" style={{ marginBottom: 14 }}>Applications received</h2>
+      <div className="dpanel">
+        <div className="dpanel__list">
+          {applications.length === 0 && <div style={{ padding: "18px 0", textAlign: "center" }} className="muted">No applications yet — post a brief to start receiving them.</div>}
+          {applications.map(a => (
+            <div key={a.id} className="drow">
+              <img src={a.talentPhoto} alt="" style={{ width: 44, height: 44, borderRadius: 14, objectFit: "cover", flex: "none" }} />
+              <div className="drow__main">
+                <div className="drow__t">{a.talentName} — {a.briefTitle}</div>
+                <div className="drow__m">${a.price} · {a.delivery} day delivery · {a.when}</div>
+              </div>
+              <Chip tone="pending">Pending</Chip>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ================= Billing ================= */
+function TabBilling() {
+  const charges = [
+    { t: "Aperture skincare AI license", w: "Jun 24", amt: 2940 },
+    { t: "Halo product reels license", w: "Feb 3", amt: 2040 },
+    { t: "Gaming brand lock (pending checkout)", w: "—", amt: 3200 },
+  ];
+  return (
+    <div className="dgrid">
+      <div className="dcol">
+        <div className="dpanel">
+          <h2 className="dpanel__title">Payment method</h2>
+          <div className="drow" style={{ marginTop: 8 }}>
+            <span className="drow__logo" style={{ background: "linear-gradient(135deg,#1C212B,#5A5B60)" }}>••</span>
+            <div className="drow__main">
+              <div className="drow__t">Visa ····4242</div>
+              <div className="drow__m">Managed by our secure checkout partner</div>
+            </div>
+            <Button variant="secondary" size="sm">Update</Button>
+          </div>
+        </div>
+        <div className="dpanel">
+          <h2 className="dpanel__title">Recent charges</h2>
+          <div className="dpanel__list">
+            {charges.map((c, i) => (
+              <div key={i} className="drow">
+                <div className="drow__main">
+                  <div className="drow__t">{c.t}</div>
+                  <div className="drow__m">{c.w}</div>
+                </div>
+                <div className="drow__amt">${c.amt.toLocaleString()}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="dcol">
+        <div className="dpanel">
+          <div className="dstat__k">Billing</div>
+          <p className="muted" style={{ fontSize: 14, marginTop: 10 }}>All payments and contracts are handled by our secure checkout partner. Manage invoices, receipts and tax documents there.</p>
+          <div style={{ marginTop: 14 }}><Button variant="secondary" size="sm">Open billing portal</Button></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BuyerDash() {
   React.useEffect(() => { setRole("buyer"); }, []);
   const BUYER_NAME = "Northwind";
+  const params = new URLSearchParams(location.search);
+  const initialTab = TABS.find(t => t.toLowerCase() === (params.get("tab") || "").toLowerCase()) || "Overview";
+  const [tab, setTab] = React.useState(initialTab);
+
   const licenses = [
     { inf: INFLUENCERS[0], tier: "Campaign", spent: 2940, status: "active", since: "Jan 2026", channel: "Aperture skincare AI" },
     { inf: INFLUENCERS[6], tier: "Monthly", spent: 2040, status: "active", since: "Feb 2026", channel: "Halo product reels" },
@@ -50,9 +279,10 @@ function BuyerDash() {
     { id: 3, talentId: "mara", buyer: "Vellum", asset: "Product still set (4)", description: "Four product stills for an e-commerce listing, neutral background, twin gesturing toward the product.", tier: "Single use", when: "1d ago", status: "pending" },
   ];
   const [subs, updateSub] = useSubmissions(DEFAULT_SUBS);
-  const approvals = subs;
+  const [offers, updateOffer] = useOffers(DEFAULT_OFFERS);
+  const applications = useApplications();
 
-  const [submitFor, setSubmitFor] = React.useState(null); // license being submitted against
+  const [submitFor, setSubmitFor] = React.useState(null);
   const [asset, setAsset] = React.useState("");
   const [desc, setDesc] = React.useState("");
   const closeSubmit = () => { setSubmitFor(null); setAsset(""); setDesc(""); };
@@ -67,7 +297,6 @@ function BuyerDash() {
     <>
       <SimpleHeader page="dash" role="business" />
 
-      {/* Submit content modal */}
       <div className={"overlay" + (submitFor ? " overlay--on" : "")} onClick={closeSubmit}>
         <div className="modal" style={{ maxWidth: 520 }} onClick={e => e.stopPropagation()} role="dialog" aria-modal="true">
           <p className="eyebrow" style={{ marginBottom: 10 }}>Submit content for approval</p>
@@ -94,142 +323,29 @@ function BuyerDash() {
           </form>
         </div>
       </div>
+
       <main className="wrap" style={{ paddingTop: 34, paddingBottom: 80 }}>
-        {/* Greeting */}
         <div className="dash-head">
           <div>
-            <h1 className="dash-h1">Good morning, Northwind</h1>
-            <p className="dash-sub">Your workspace — licensed twins, approvals and spend.</p>
+            <h1 className="dash-h1">Welcome back, {BUYER_NAME}</h1>
+            <p className="dash-sub">Manage your licenses, offers, and the talent you hire.</p>
           </div>
-          <Button variant="primary" href="browse-twins.html">Browse twins</Button>
-        </div>
-
-        {/* Stats */}
-        <div className="dstats" style={{ marginTop: 26 }}>
-          <div className="dstat dstat--dark">
-            <div className="dstat__k">Spent in 2026</div>
-            <div className="dstat__n">${licenses.reduce((sum, l) => sum + l.spent, 0).toLocaleString()}</div>
-            <div className="dstat__f">Across {licenses.length} licenses</div>
-          </div>
-          <div className="dstat">
-            <div className="dstat__k">Active licenses</div>
-            <div className="dstat__n">2</div>
-            <div className="dstat__f">1 pending at checkout</div>
-          </div>
-          <div className="dstat">
-            <div className="dstat__k">Awaiting approval</div>
-            <div className="dstat__n">{subs.filter(s => s.status === "pending").length}</div>
-            <div className="dstat__f">Talent reviewing</div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Button variant="secondary" href="browse-twins.html">Browse twins</Button>
+            <Button variant="primary" href="my-briefs.html">Post a brief</Button>
           </div>
         </div>
 
-        <div className="dgrid">
-          {/* Left column */}
-          <div className="dcol">
-            {/* Licenses */}
-            <div className="dpanel">
-              <div className="dpanel__head">
-                <h2 className="dpanel__title">Your licenses</h2>
-                <a className="dpanel__link" href="browse-twins.html">Browse twins</a>
-              </div>
-              <div className="dpanel__list">
-                {licenses.map((l, i) => (
-                  <div key={i} className="drow">
-                    <Avatar inf={l.inf} />
-                    <div className="drow__main">
-                      <div className="drow__t">{l.inf.name}</div>
-                      <div className="drow__m">{l.tier} · {l.channel}</div>
-                    </div>
-                    <div className="drow__amt">${l.spent.toLocaleString()}<span className="muted" style={{ fontWeight: 400 }}> spent</span></div>
-                    <button onClick={() => setSubmitFor(l)} style={{ padding: "9px 16px", border: "1px solid var(--border-strong)", borderRadius: 999, fontSize: 13, fontWeight: 700, flex: "none", background: "var(--card-bg)", cursor: "pointer" }}>Submit content</button>
-                  </div>
-                ))}
-              </div>
-            </div>
+        <div className="hub-tabs" style={{ marginTop: 22, marginBottom: 6 }}>
+          {TABS.map(t => (
+            <button key={t} className={"hub-tab" + (tab === t ? " hub-tab--on" : "")} onClick={() => setTab(t)}>{t}</button>
+          ))}
+        </div>
 
-            {/* Approval queue */}
-            <div className="dpanel">
-              <div className="dpanel__head">
-                <h2 className="dpanel__title">Approval queue</h2>
-                <span className="dstat__k">Talent signs off before publish</span>
-              </div>
-              <div className="dpanel__list">
-                {approvals.map((a, i) => (
-                  <div key={i} className="drow">
-                    <Avatar inf={INFLUENCERS.find(x => x.id === a.talentId) || INFLUENCERS[0]} />
-                    <div className="drow__main">
-                      <div className="drow__t">{a.asset}</div>
-                      <div className="drow__m">{(INFLUENCERS.find(x => x.id === a.talentId) || {}).name} · {a.status === "pending" ? "Awaiting talent approval" : a.status === "approved" ? "Approved · ready to publish" : "Declined by talent"}</div>
-                    </div>
-                    {a.status === "approved"
-                      ? <Chip tone="active">Approved</Chip>
-                      : a.status === "declined"
-                        ? <Chip tone="muted">Declined</Chip>
-                        : <Chip tone="pending">In review</Chip>}
-                  </div>
-                ))}
-                {approvals.length === 0 && <div style={{ padding: "18px 0", textAlign: "center" }} className="muted">Nothing submitted yet — submit content from a license above.</div>}
-              </div>
-            </div>
-          </div>
-
-          {/* Right column */}
-          <div className="dcol">
-            {/* Recommended twins */}
-            <div className="dpanel dpanel--tint">
-              <div className="dpanel__head">
-                <h2 className="dpanel__title" style={{ fontSize: 16 }}>Recommended twins</h2>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", marginTop: 6 }}>
-                {INFLUENCERS.slice(8, 11).map(inf => (
-                  <a key={inf.id} href={"profile-business.html?id=" + inf.id} className="dside-row">
-                    <Avatar inf={inf} size={34} radius={11} />
-                    <span style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ display: "block", fontSize: 13.5, fontWeight: 600 }}>{inf.name}</span>
-                      <span style={{ display: "block", fontSize: 12, color: "var(--text-tertiary)" }}>{inf.niche} · {inf.followers}</span>
-                    </span>
-                    <span style={{ fontSize: 12.5, fontWeight: 700, flex: "none" }}>${inf.rate}</span>
-                  </a>
-                ))}
-              </div>
-              <a href="browse-twins.html" style={{ display: "inline-block", fontSize: 13, fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 2, marginTop: 14 }}>Browse more twins</a>
-            </div>
-
-            {/* Messages */}
-            <div className="dpanel">
-              <div className="dpanel__head">
-                <h2 className="dpanel__title">Messages</h2>
-                <a className="dpanel__link" href="messages.html?as=business">Open chat</a>
-              </div>
-              <div className="dpanel__list">
-                {INFLUENCERS.slice(0, 3).map((inf, i) => (
-                  <a key={inf.id} href={"messages.html?as=business&with=" + inf.id} className="drow" style={{ textDecoration: "none", color: "inherit" }}>
-                    <Avatar inf={inf} />
-                    <div className="drow__main">
-                      <div className="drow__t">{inf.name}</div>
-                      <div className="drow__m">{["Thanks for reaching out — happy to hear more.", "Sounds good, sending the deck over now.", "Can we push the shoot to next week?"][i]}</div>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Consent protection (dark) */}
-            <div className="dpanel dpanel--dark">
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#B4FF6A" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
-                Consent-protected
-              </div>
-              <p style={{ fontSize: 13.5, lineHeight: 1.55, color: "rgba(255,255,255,0.8)", margin: "10px 0 0" }}>Your payment is held securely and only releases once the talent approves each use. Nothing goes live without their sign-off.</p>
-            </div>
-
-            {/* Billing */}
-            <div className="dpanel">
-              <div className="dstat__k">Billing</div>
-              <p className="muted" style={{ fontSize: 14, marginTop: 10 }}>All payments and contracts are handled by our secure checkout partner. Manage invoices and receipts there.</p>
-              <div style={{ marginTop: 14 }}><Button variant="secondary" size="sm">Open billing portal</Button></div>
-            </div>
-          </div>
+        <div style={{ marginTop: 6 }}>
+          {tab === "Overview" && <TabOverview licenses={licenses} approvals={subs} setSubmitFor={setSubmitFor} />}
+          {tab === "Proposals & offers" && <TabProposals offers={offers} updateOffer={updateOffer} applications={applications} />}
+          {tab === "Billing" && <TabBilling />}
         </div>
       </main>
       <Footer />

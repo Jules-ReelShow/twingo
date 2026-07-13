@@ -57,7 +57,10 @@ function Messages() {
 
   const contacts = asBusiness
     ? INFLUENCERS.slice(0, 8).map(i => ({ id: i.id, name: i.name, photo: i.photo, sub: i.niche + " · " + i.platform }))
-    : BRIEFS.map(b => ({ id: b.id, name: b.company, sub: "Brand", avatarColor: b.color }));
+    : [
+        ...BRIEFS.map(b => ({ id: b.id, name: b.company, sub: "Brand", avatarColor: b.color })),
+        ...DEFAULT_OFFERS.map(o => ({ id: o.id, name: o.brand, sub: "Brand", avatarColor: "var(--ink)" })),
+      ];
 
   const initialId = withId || (contacts[0] && contacts[0].id);
   const [activeId, setActiveId] = React.useState(initialId);

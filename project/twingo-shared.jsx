@@ -128,6 +128,66 @@ function useApplications() {
   return list;
 }
 
+/* ---------- Shared package offers (business → talent, business can revise while pending) ---------- */
+const OFFER_KEY = "twingo-offers";
+function getOffers() {
+  try { const v = JSON.parse(localStorage.getItem(OFFER_KEY)); return Array.isArray(v) ? v : null; } catch (e) { return null; }
+}
+function setOffers(list) {
+  try { localStorage.setItem(OFFER_KEY, JSON.stringify(list)); } catch (e) {}
+  window.dispatchEvent(new CustomEvent("twingo-offers"));
+}
+function seedOffers(defaults) {
+  const existing = getOffers();
+  if (existing) return existing;
+  setOffers(defaults);
+  return defaults;
+}
+function useOffers(defaults) {
+  const [list, setList] = React.useState(() => seedOffers(defaults || []));
+  React.useEffect(() => {
+    const onChange = () => setList(getOffers() || []);
+    window.addEventListener("twingo-offers", onChange);
+    window.addEventListener("storage", onChange);
+    return () => { window.removeEventListener("twingo-offers", onChange); window.removeEventListener("storage", onChange); };
+  }, []);
+  const update = (id, patch) => {
+    const next = (getOffers() || []).map(o => o.id === id ? { ...o, ...patch } : o);
+    setOffers(next);
+    setList(next);
+  };
+  return [list, update];
+}
+
+/* ---------- Shared talent portfolio (dashboard upload → public profile) ---------- */
+function portfolioKey(talentId) { return "twingo-portfolio-" + talentId; }
+function getPortfolio(talentId) {
+  try { const v = JSON.parse(localStorage.getItem(portfolioKey(talentId))); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+}
+function setPortfolio(talentId, list) {
+  try { localStorage.setItem(portfolioKey(talentId), JSON.stringify(list)); } catch (e) {}
+  window.dispatchEvent(new CustomEvent("twingo-portfolio"));
+}
+function addPortfolioItem(talentId, item) {
+  const list = getPortfolio(talentId);
+  const next = [{ id: Date.now(), ...item }, ...list];
+  setPortfolio(talentId, next);
+  return next;
+}
+function removePortfolioItem(talentId, id) {
+  setPortfolio(talentId, getPortfolio(talentId).filter(i => i.id !== id));
+}
+function usePortfolio(talentId) {
+  const [list, setList] = React.useState(() => getPortfolio(talentId));
+  React.useEffect(() => {
+    const onChange = () => setList(getPortfolio(talentId));
+    window.addEventListener("twingo-portfolio", onChange);
+    window.addEventListener("storage", onChange);
+    return () => { window.removeEventListener("twingo-portfolio", onChange); window.removeEventListener("storage", onChange); };
+  }, [talentId]);
+  return list;
+}
+
 /* ---------- Twingo brand mark ---------- */
 /* Owner's mark: two overlapping rings ("twin" + loop) with a lime "go" dot,
    rendered in the ink + lime palette. */
@@ -155,6 +215,7 @@ function TwingoMark({ size = 28, wordmark = false, wordSize = 20, light = false 
 const IconIn = (props) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props} />;
 const IconUser = () => <IconIn><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" /></IconIn>;
 const IconGrid = () => <IconIn><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /></IconIn>;
+const IconMessage = () => <IconIn><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" /></IconIn>;
 const IconSettings = () => <IconIn><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></IconIn>;
 const IconHelp = () => <IconIn><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></IconIn>;
 const IconLogout = () => <IconIn><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></IconIn>;
@@ -439,6 +500,7 @@ function ProfileMenu({ dashHref }) {
         <div className="menu__sep"></div>
         <a href={dashHref.startsWith("buyer") ? "my-briefs.html" : "profile-talent.html?id=mara"} className="menu__item" role="menuitem"><IconUser />View Profile</a>
         <a href={dashHref} className="menu__item" role="menuitem"><IconGrid />Dashboard</a>
+        <a href={"messages.html" + (dashHref.startsWith("buyer") ? "?as=business" : "")} className="menu__item" role="menuitem"><IconMessage />Messages</a>
         <a href="settings.html" className="menu__item" role="menuitem"><IconSettings />Settings</a>
         <a href="help-support.html" className="menu__item" role="menuitem"><IconHelp />Help &amp; Support</a>
         <div className="menu__sep"></div>
@@ -548,6 +610,13 @@ const BRIEFS = [
   { id: "kitel",   company: "Kit Electronics",  initial: "K", color: "#3A4150",        title: "Unboxing & review-style content",      niche: "Branded Content",      platform: "YouTube",   budget: "$1,500 – $2,500", commit: "Fixed price", dur: "2 weeks",   posted: "4 days ago",  postedDate: "Jul 9, 2026",  proposals: 14, desc: "Unboxing and review-style content for a new product line, multiple variations for A/B testing." },
   { id: "modiste", company: "Modiste",          initial: "M", color: "#B24A31",        title: "Lookbook stills + reels for capsule drop", niche: "Branded Content", platform: "Instagram", budget: "$900 – $1,600",  commit: "Fixed price", dur: "10 days",   posted: "1 week ago",  postedDate: "Jul 6, 2026",  proposals: 22, desc: "Lookbook stills and short reels for a capsule collection drop. Editorial, minimal styling." },
   { id: "lumen",   company: "Lumen Learning",   initial: "L", color: "#12894B",        title: "Friendly host for explainer video series", niche: "Edutainment", platform: "TikTok", budget: "$600 – $1,100",  commit: "One-off",     dur: "1 week",    posted: "2 days ago",  postedDate: "Jul 11, 2026", proposals: 8, desc: "Friendly host for a series of short explainer videos aimed at young adults. Clear, warm delivery." },
+];
+
+/* ---------- Package offers dataset (business → talent, shared/editable while pending) ---------- */
+const DEFAULT_OFFERS = [
+  { id: "aperture",  brand: "Aperture AI",      initials: "AA", talentId: "mara", title: "Skincare hero — variant 3", meta: "Product still · Campaign package", desc: "Product hero still for our spring skincare launch — twin holding the serum bottle, soft studio lighting, no text overlay.", price: 820, priceSub: "Campaign · 20 assets", status: "new" },
+  { id: "northwind", brand: "Northwind Studio", initials: "NS", talentId: "mara", title: "Lifestyle reel, 0:15", meta: "Single use · Vertical video", desc: "15-second vertical reel, twin walking through a sunlit apartment for a home goods spot. Non-exclusive, TikTok + Reels only.", price: 380, priceSub: "Single use", status: "new" },
+  { id: "koan",      brand: "Studio Kōan",      initials: "SK", talentId: "mara", title: "Category buyout — wellness", meta: "Exclusive · 12 months", desc: "Full category exclusivity for wellness & supplements. Includes stills and up to 6 short-form videos per quarter.", price: 2400, priceSub: "Exclusive · 12 mo", status: "accepted" },
 ];
 
 /* ---------- Influencer card (browse / featured) ---------- */
@@ -738,6 +807,8 @@ Object.assign(window, {
   getAccountType, setAccountType, getTalentOnboarded, setTalentOnboarded,
   getSubmissions, setSubmissions, addSubmission, seedSubmissions, useSubmissions,
   getApplications, setApplications, addApplication, useApplications,
+  getOffers, setOffers, seedOffers, useOffers, DEFAULT_OFFERS,
+  getPortfolio, setPortfolio, addPortfolioItem, removePortfolioItem, usePortfolio,
   TwingoMark, SimpleHeader, ThemeToggle, RoleSwitcher, Footer, TrustRow, Portrait,
   INFLUENCERS, NICHES, PLATFORMS, BRIEFS, InfluencerCard, HandoffModal, MessageModal, AuthModal, CONTENT_IMG,
 });

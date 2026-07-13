@@ -128,6 +128,7 @@ function Profile() {
   const related = INFLUENCERS.filter(i => i.id !== inf.id && i.niche === inf.niche).slice(0, 4);
   const filler = INFLUENCERS.filter(i => i.id !== inf.id).slice(0, 4);
   const rel = (related.length ? related : filler).slice(0, 4);
+  const uploaded = usePortfolio(inf.id);
 
   return (
     <>
@@ -222,6 +223,17 @@ function Profile() {
             <span className="meta">Photos, videos and past collaborations {inf.name.split(" ")[0]} has added</span>
           </div>
           <div className="grid grid-4">
+            {uploaded.map((item) => (
+              <div key={"up-" + item.id} className="card card--hover" style={{ overflow: "hidden" }}>
+                {item.type === "video"
+                  ? <video src={item.src} style={{ width: "100%", aspectRatio: "1 / 1", objectFit: "cover", display: "block" }} muted />
+                  : <img src={item.src} alt="" style={{ width: "100%", aspectRatio: "1 / 1", objectFit: "cover", display: "block" }} />}
+                <div style={{ padding: "12px 14px" }}>
+                  <span style={{ fontSize: 13, fontWeight: 500 }}>{item.name || "Uploaded work"}</span>
+                  <div className="meta" style={{ marginTop: 3 }}>{item.type === "video" ? "Video" : "Photo"}</div>
+                </div>
+              </div>
+            ))}
             {[
               { cap: "Portrait set", kind: "Photo" },
               { cap: "Skincare campaign", kind: "Client work" },
