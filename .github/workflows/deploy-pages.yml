@@ -28,7 +28,11 @@ jobs:
         run: |
           mkdir -p _site
           cp -r project/. _site/
-          rm -rf _site/uploads _site/scraps _site/.thumbnail _site/.image-slots.state.json
+          # NOTE: .image-slots.state.json is NOT excluded — it's the sidecar
+          # data store backing every <image-slot>'s dropped image (hero
+          # portraits, browse-briefs collage, etc.), not disposable tooling
+          # metadata. Stripping it blanks out real photos on the live site.
+          rm -rf _site/uploads _site/scraps _site/.thumbnail
           # GitHub Pages defaults to Jekyll, which ignores files/dirs starting
           # with "_" (like project/_ds) unless this marker is present.
           touch _site/.nojekyll
