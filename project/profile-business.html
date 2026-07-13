@@ -128,10 +128,14 @@ function Profile() {
   const related = INFLUENCERS.filter(i => i.id !== inf.id && i.niche === inf.niche).slice(0, 4);
   const filler = INFLUENCERS.filter(i => i.id !== inf.id).slice(0, 4);
   const rel = (related.length ? related : filler).slice(0, 4);
+  const [signedIn] = useSignedIn();
+  const [authOpen, setAuthOpen] = React.useState(null);
+  const requireAuth = (action) => { if (signedIn) action(); else setAuthOpen("signin"); };
 
   return (
     <>
       <SimpleHeader page="browse" role="business" />
+      <AuthModal open={!!authOpen} mode={authOpen || "signin"} audience="business" onClose={() => setAuthOpen(null)} />
       <HandoffModal open={!!modal} onClose={() => setModal(null)} inf={inf} tier={modal} />
       <MessageModal open={msgOpen} onClose={() => setMsgOpen(false)} inf={inf} />
 
@@ -176,7 +180,7 @@ function Profile() {
               </div>
 
               <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
-                <Button variant="primary" href={"messages.html?as=business&with=" + inf.id} style={{ background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Message talent</Button>
+                <Button variant="primary" onClick={() => requireAuth(() => { window.location.href = "messages.html?as=business&with=" + inf.id; })} style={{ background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Message talent</Button>
               </div>
               <div style={{ marginTop: 20 }}><TrustRow /></div>
             </div>
@@ -204,7 +208,7 @@ function Profile() {
                     </li>
                   ))}
                 </ul>
-                <Button variant={t.variant === "primary" ? "lime" : "secondary"} onClick={() => setModal(t)} style={{ width: "100%", justifyContent: "center", display: "flex" }}>Request this package</Button>
+                <Button variant={t.variant === "primary" ? "lime" : "secondary"} onClick={() => requireAuth(() => setModal(t))} style={{ width: "100%", justifyContent: "center", display: "flex" }}>Request this package</Button>
               </div>
             ))}
           </div>

@@ -42,7 +42,7 @@ function DetailRow({ k, v }) {
   );
 }
 
-function ApplyForm({ brief, onSent }) {
+function ApplyForm({ brief, onSent, signedIn, onNeedAuth }) {
   const [title, setTitle] = React.useState("Application for " + brief.title);
   const [price, setPrice] = React.useState(String(parseInt((brief.budget.match(/[\d,]+/) || ["500"])[0].replace(/,/g, ""), 10) || 500));
   const [delivery, setDelivery] = React.useState("14");
@@ -52,6 +52,7 @@ function ApplyForm({ brief, onSent }) {
 
   const submit = (e) => {
     e.preventDefault();
+    if (!signedIn) { onNeedAuth(); return; }
     addApplication({
       briefId: brief.id, briefTitle: brief.title, company: brief.company,
       talentId: TALENT_ID, talentName: MOCK_USER.name, talentPhoto: MOCK_USER.photo,
@@ -128,10 +129,13 @@ function BriefDetail() {
   const [justSent, setJustSent] = React.useState(false);
   const applied = justSent || mine.length > 0;
   const totalApps = brief.proposals + applications.filter(a => a.briefId === brief.id).length;
+  const [signedIn] = useSignedIn();
+  const [authOpen, setAuthOpen] = React.useState(null);
 
   return (
     <>
       <SimpleHeader page="briefs" />
+      <AuthModal open={!!authOpen} mode={authOpen || "signin"} audience="talent" onClose={() => setAuthOpen(null)} />
       <main className="wrap" style={{ paddingTop: 30, paddingBottom: 80, maxWidth: 980 }}>
         <div className="meta" style={{ marginBottom: 16 }}>
           <a href="browse-briefs.html" style={{ color: "inherit" }}>Browse briefs</a> / <span style={{ color: "var(--ink)" }}>{brief.title}</span>
@@ -173,7 +177,7 @@ function BriefDetail() {
               <h2 className="h3">{applied ? "You applied to this brief" : "Send an application"}</h2>
               {!applied && <p className="muted" style={{ fontSize: 13.5, marginTop: 6, marginBottom: 4 }}>Set your proposed price, timeline, revisions and expiry. {brief.company} can accept or message you with questions.</p>}
               <div style={{ marginTop: 18 }}>
-                {applied ? <AppliedState brief={brief} /> : <ApplyForm brief={brief} onSent={() => setJustSent(true)} />}
+                {applied ? <AppliedState brief={brief} /> : <ApplyForm brief={brief} onSent={() => setJustSent(true)} signedIn={signedIn} onNeedAuth={() => setAuthOpen("signin")} />}
               </div>
             </div>
           </div>
@@ -187,7 +191,7 @@ function BriefDetail() {
               <DetailRow k="Client" v={brief.company} />
               <DetailRow k="Posted" v={brief.postedDate} />
               <div style={{ marginTop: 18 }}>
-                <Button variant="secondary" href={"messages.html?with=" + brief.id} style={{ width: "100%", justifyContent: "center", display: "flex" }}>Message {brief.company}</Button>
+                <Button variant="secondary" onClick={() => signedIn ? (window.location.href = "messages.html?with=" + brief.id) : setAuthOpen("signin")} style={{ width: "100%", justifyContent: "center", display: "flex" }}>Message {brief.company}</Button>
               </div>
             </div>
           </div>

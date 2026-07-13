@@ -372,7 +372,7 @@ function SimpleHeader({ page, role, anchorBase = "talent-home.html" }) {
   const [signedIn] = useSignedIn();
   const [authOpen, setAuthOpen] = React.useState(null);
   const [drawer, setDrawer] = React.useState(false);
-  const showBriefs = role !== "business" && signedIn;
+  const showBriefs = role !== "business";
   const dashHref = role === "business" ? "buyer-dashboard.html" : "talent-dashboard.html";
   const navItems = [
     role === "business"
