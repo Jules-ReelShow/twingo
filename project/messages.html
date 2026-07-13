@@ -23,19 +23,18 @@
 <script type="text/babel" src="twingo-shared.jsx"></script>
 <script type="text/babel">
 const { Button } = window.TwingoDesignSystem_122db6;
-
-/* Mock brand contacts for talent-mode inbox (businesses messaging the creator) */
-const BRANDS = [
-  { id: "aurora",  name: "Aurora Skincare", avatarColor: "var(--vermilion)" },
-  { id: "flux",    name: "Flux Games",      avatarColor: "var(--success)" },
-  { id: "verde",   name: "Verde Foods",     avatarColor: "var(--vermilion-clay)" },
-  { id: "pulse",   name: "Pulse Fitness",   avatarColor: "var(--ink)" },
-];
+const TALENT_ID = "mara";
 
 function initials(name) { return name.split(" ").map(w => w[0]).slice(0, 2).join(""); }
 
-function seedThread(otherName, youAreBusiness) {
+function seedThread(otherName, youAreBusiness, application) {
   const other = otherName.split(" ")[0];
+  if (application) {
+    return [
+      { from: "me", t: "Hi, I just sent my application for “" + application.briefTitle + "” — $" + application.price + ", " + application.delivery + " day delivery. Let me know if you have any questions!" },
+      { from: "them", t: "Thanks for applying! We'll take a look and get back to you shortly." },
+    ];
+  }
   if (youAreBusiness) {
     return [
       { from: "me", t: "Hi " + other + ", we'd love to license your AI twin for an upcoming product campaign." },
@@ -54,17 +53,19 @@ function Messages() {
   const params = new URLSearchParams(location.search);
   const asBusiness = params.get("as") === "business";
   const withId = params.get("with");
+  const applications = useApplications();
 
   const contacts = asBusiness
     ? INFLUENCERS.slice(0, 8).map(i => ({ id: i.id, name: i.name, photo: i.photo, sub: i.niche + " · " + i.platform }))
-    : BRANDS.map(b => ({ id: b.id, name: b.name, sub: "Brand", avatarColor: b.avatarColor }));
+    : BRIEFS.map(b => ({ id: b.id, name: b.company, sub: "Brand", avatarColor: b.color }));
 
   const initialId = withId || (contacts[0] && contacts[0].id);
   const [activeId, setActiveId] = React.useState(initialId);
   const active = contacts.find(c => c.id === activeId) || contacts[0];
   const [threads, setThreads] = React.useState({});
   const [draft, setDraft] = React.useState("");
-  const thread = (active && threads[active.id]) || (active ? seedThread(active.name, asBusiness) : []);
+  const application = active && !asBusiness ? applications.find(a => a.briefId === active.id && a.talentId === TALENT_ID) : null;
+  const thread = (active && threads[active.id]) || (active ? seedThread(active.name, asBusiness, application) : []);
   const scrollRef = React.useRef(null);
 
   React.useEffect(() => {

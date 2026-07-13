@@ -541,7 +541,7 @@ image-slot { display: block; width: 100%; height: auto; background: var(--surfac
 
 .hub-field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 18px; }
 .hub-field__l { font-size: 13px; font-weight: 600; color: var(--ink); }
-.hub-field input[type="text"], .hub-field input:not([type]), .hub-field textarea { width: 100%; font-family: var(--font-body); font-size: 14px; color: var(--ink); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 10px 13px; background: var(--card-bg); }
+.hub-field input[type="text"], .hub-field input[type="number"], .hub-field input:not([type]), .hub-field textarea { width: 100%; font-family: var(--font-body); font-size: 14px; color: var(--ink); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 10px 13px; background: var(--card-bg); }
 .hub-field textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
 .hub-field input:focus, .hub-field textarea:focus { outline: none; border-color: var(--ink); box-shadow: var(--shadow-sm); }
 .hub-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }

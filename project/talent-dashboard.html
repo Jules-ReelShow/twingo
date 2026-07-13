@@ -44,6 +44,8 @@ function TalentDash() {
   ];
   const [subs, updateSub] = useSubmissions(DEFAULT_SUBS);
   const queue = subs.filter(s => s.talentId === TALENT_ID && s.status === "pending");
+  const applications = useApplications();
+  const myApplications = applications.filter(a => a.talentId === TALENT_ID);
   const [licenses, setLicenses] = React.useState([
     { id: 1, buyer: "Aperture AI", tier: "Campaign", price: 980, uses: 42, live: true },
     { id: 2, buyer: "Halo Labs", tier: "Monthly", price: 380, uses: 8, live: true },
@@ -178,6 +180,30 @@ function TalentDash() {
                     {l.live
                       ? <Button variant="secondary" size="sm" onClick={() => revoke(l.id)}>Revoke</Button>
                       : <Chip tone="muted">Revoked</Chip>}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Your applications */}
+            <div className="dpanel">
+              <div className="dpanel__head">
+                <h2 className="dpanel__title">Your applications</h2>
+                <a className="dpanel__link" href="browse-briefs.html">Browse briefs</a>
+              </div>
+              <div className="dpanel__list">
+                {myApplications.length === 0 && <div style={{ padding: "18px 0", textAlign: "center" }} className="muted">No applications yet — browse open briefs to apply.</div>}
+                {myApplications.map(a => (
+                  <div key={a.id} className="drow">
+                    <span className="drow__logo" style={{ background: "linear-gradient(135deg,#1C212B,#5A5B60)" }}>{a.company.slice(0, 2).toUpperCase()}</span>
+                    <div className="drow__main">
+                      <div className="drow__t">{a.briefTitle}</div>
+                      <div className="drow__m">{a.company} · ${a.price} · {a.when}</div>
+                    </div>
+                    <div style={{ display: "flex", gap: 8, flex: "none" }}>
+                      <Button variant="secondary" size="sm" href={"messages.html?with=" + a.briefId}>Message</Button>
+                      <Chip tone="live">Pending</Chip>
+                    </div>
                   </div>
                 ))}
               </div>

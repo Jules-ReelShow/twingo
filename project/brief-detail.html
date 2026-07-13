@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TwinGo — Brief</title>
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/fonts.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/colors.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/typography.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/spacing.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/tokens/effects.css" />
+<link rel="stylesheet" href="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/styles.css" />
+<link rel="stylesheet" href="twingo.css" />
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds/twingo-design-system-122db686-7509-4ef3-956f-fb19cafbf7e3/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<script type="text/babel" src="twingo-shared.jsx"></script>
+<script type="text/babel">
+const { Button } = window.TwingoDesignSystem_122db6;
+const TALENT_ID = "mara";
+
+function Chip({ tone = "muted", children }) {
+  const TONES = {
+    open: { color: "#4B7A1E", background: "#EEF9DC" },
+    pending: { color: "#7A5A00", background: "#FFF3C4" },
+    muted: { color: "#6C6E76", background: "#F0F1F4" },
+  };
+  return <span className="dchip" style={TONES[tone]}>{children}</span>;
+}
+
+function DetailRow({ k, v }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "12px 0", borderTop: "1px solid var(--border)" }}>
+      <span className="muted" style={{ fontSize: 13.5 }}>{k}</span>
+      <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--ink)", textAlign: "right" }}>{v}</span>
+    </div>
+  );
+}
+
+function ApplyForm({ brief, onSent }) {
+  const [title, setTitle] = React.useState("Application for " + brief.title);
+  const [price, setPrice] = React.useState(String(parseInt((brief.budget.match(/[\d,]+/) || ["500"])[0].replace(/,/g, ""), 10) || 500));
+  const [delivery, setDelivery] = React.useState("14");
+  const [revisions, setRevisions] = React.useState("2");
+  const [expires, setExpires] = React.useState("7");
+  const [scope, setScope] = React.useState(brief.desc);
+
+  const submit = (e) => {
+    e.preventDefault();
+    addApplication({
+      briefId: brief.id, briefTitle: brief.title, company: brief.company,
+      talentId: TALENT_ID, talentName: MOCK_USER.name, talentPhoto: MOCK_USER.photo,
+      offerTitle: title.trim() || brief.title, price: Number(price) || 0,
+      delivery: Number(delivery) || 0, revisions: Number(revisions) || 0,
+      expires: Number(expires) || 0, scope: scope.trim(),
+    });
+    onSent();
+  };
+
+  return (
+    <form onSubmit={submit}>
+      <label className="hub-field"><span className="hub-field__l">Offer title</span>
+        <input value={title} onChange={(e) => setTitle(e.target.value)} />
+      </label>
+      <div className="hub-row2">
+        <label className="hub-field">
+          <span className="hub-field__l">Price</span>
+          <div style={{ position: "relative" }}>
+            <input type="number" min="0" value={price} onChange={(e) => setPrice(e.target.value)} style={{ paddingRight: 52 }} />
+            <span className="muted" style={{ position: "absolute", right: 13, top: "50%", transform: "translateY(-50%)", fontSize: 12.5, fontWeight: 600 }}>USD</span>
+          </div>
+        </label>
+        <label className="hub-field">
+          <span className="hub-field__l">Delivery time</span>
+          <input type="number" min="1" value={delivery} onChange={(e) => setDelivery(e.target.value)} />
+          <span className="muted" style={{ fontSize: 12 }}>Days</span>
+        </label>
+      </div>
+      <div className="hub-row2">
+        <label className="hub-field">
+          <span className="hub-field__l">Revisions</span>
+          <input type="number" min="0" value={revisions} onChange={(e) => setRevisions(e.target.value)} />
+        </label>
+        <label className="hub-field">
+          <span className="hub-field__l">Offer expires in</span>
+          <input type="number" min="1" value={expires} onChange={(e) => setExpires(e.target.value)} />
+          <span className="muted" style={{ fontSize: 12 }}>Days</span>
+        </label>
+      </div>
+      <label className="hub-field">
+        <span className="hub-field__l">Scope</span>
+        <span className="muted" style={{ fontSize: 12.5, marginTop: -4, marginBottom: 2 }}>Starts with the Client brief. Edit it to describe your proposed delivery.</span>
+        <textarea rows={5} value={scope} onChange={(e) => setScope(e.target.value)}></textarea>
+      </label>
+      <Button variant="primary" type="submit" style={{ marginTop: 4, background: "var(--lime)", borderColor: "var(--lime)", color: "var(--ink-black)" }}>Send application</Button>
+    </form>
+  );
+}
+
+function AppliedState({ brief }) {
+  return (
+    <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+      <span style={{ flex: "none", width: 40, height: 40, borderRadius: "50%", background: "var(--success)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </span>
+      <div>
+        <h3 className="h3" style={{ fontSize: 17 }}>Application sent</h3>
+        <p className="muted" style={{ fontSize: 14, marginTop: 6, maxWidth: 460 }}>{brief.company} will review your offer and can accept, decline, or message you with questions.</p>
+        <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" }}>
+          <Button variant="primary" href={"messages.html?with=" + brief.id}>Message {brief.company}</Button>
+          <Button variant="secondary" href="browse-briefs.html">Browse more briefs</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BriefDetail() {
+  const id = new URLSearchParams(location.search).get("id");
+  const brief = BRIEFS.find(b => b.id === id) || BRIEFS[0];
+  const applications = useApplications();
+  const mine = applications.filter(a => a.briefId === brief.id && a.talentId === TALENT_ID);
+  const [justSent, setJustSent] = React.useState(false);
+  const applied = justSent || mine.length > 0;
+  const totalApps = brief.proposals + applications.filter(a => a.briefId === brief.id).length;
+
+  return (
+    <>
+      <SimpleHeader page="briefs" />
+      <main className="wrap" style={{ paddingTop: 30, paddingBottom: 80, maxWidth: 980 }}>
+        <div className="meta" style={{ marginBottom: 16 }}>
+          <a href="browse-briefs.html" style={{ color: "inherit" }}>Browse briefs</a> / <span style={{ color: "var(--ink)" }}>{brief.title}</span>
+        </div>
+
+        <div className="dgrid">
+          <div className="dcol">
+            <div className="dpanel">
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                <Chip tone="muted">{brief.niche}</Chip>
+                <Chip tone="open">Open</Chip>
+              </div>
+              <h1 className="dash-h1" style={{ fontSize: 30 }}>{brief.title}</h1>
+              <p className="muted" style={{ fontSize: 14, marginTop: 8 }}>Posted by {brief.company} on {brief.postedDate}</p>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginTop: 24, paddingTop: 20, borderTop: "1px solid var(--border)" }}>
+                <div>
+                  <div className="muted" style={{ fontSize: 12.5 }}>Budget</div>
+                  <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 19, marginTop: 4 }}>{brief.budget}</div>
+                </div>
+                <div>
+                  <div className="muted" style={{ fontSize: 12.5 }}>Delivery</div>
+                  <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 19, marginTop: 4 }}>{brief.dur}</div>
+                </div>
+                <div>
+                  <div className="muted" style={{ fontSize: 12.5 }}>Applications</div>
+                  <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 19, marginTop: 4 }}>{totalApps} application{totalApps === 1 ? "" : "s"}</div>
+                </div>
+              </div>
+
+              <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid var(--border)" }}>
+                <h2 className="h3" style={{ fontSize: 16 }}>Scope</h2>
+                <p style={{ fontSize: 14.5, lineHeight: 1.6, color: "var(--text-secondary)", marginTop: 8 }}>{brief.desc}</p>
+              </div>
+            </div>
+
+            <div className="dpanel">
+              <p className="eyebrow" style={{ marginBottom: 4 }}>{applied ? "Applied" : "Apply to this brief"}</p>
+              <h2 className="h3">{applied ? "You applied to this brief" : "Send an application"}</h2>
+              {!applied && <p className="muted" style={{ fontSize: 13.5, marginTop: 6, marginBottom: 4 }}>Set your proposed price, timeline, revisions and expiry. {brief.company} can accept or message you with questions.</p>}
+              <div style={{ marginTop: 18 }}>
+                {applied ? <AppliedState brief={brief} /> : <ApplyForm brief={brief} onSent={() => setJustSent(true)} />}
+              </div>
+            </div>
+          </div>
+
+          <div className="dcol">
+            <div className="dpanel">
+              <h2 className="dpanel__title" style={{ marginBottom: 4 }}>Brief details</h2>
+              <DetailRow k="Status" v="Open" />
+              <DetailRow k="Category" v={brief.niche} />
+              <DetailRow k="Platform" v={brief.platform} />
+              <DetailRow k="Client" v={brief.company} />
+              <DetailRow k="Posted" v={brief.postedDate} />
+              <div style={{ marginTop: 18 }}>
+                <Button variant="secondary" href={"messages.html?with=" + brief.id} style={{ width: "100%", justifyContent: "center", display: "flex" }}>Message {brief.company}</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+const __el = document.getElementById("root");
+(window.__twRoot = window.__twRoot || ReactDOM.createRoot(__el)).render(<BriefDetail />);
+</script>
+</body>
+</html>

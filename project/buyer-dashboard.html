@@ -195,6 +195,25 @@ function BuyerDash() {
               <a href="browse-twins.html" style={{ display: "inline-block", fontSize: 13, fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 2, marginTop: 14 }}>Browse more twins</a>
             </div>
 
+            {/* Messages */}
+            <div className="dpanel">
+              <div className="dpanel__head">
+                <h2 className="dpanel__title">Messages</h2>
+                <a className="dpanel__link" href="messages.html?as=business">Open chat</a>
+              </div>
+              <div className="dpanel__list">
+                {INFLUENCERS.slice(0, 3).map((inf, i) => (
+                  <a key={inf.id} href={"messages.html?as=business&with=" + inf.id} className="drow" style={{ textDecoration: "none", color: "inherit" }}>
+                    <Avatar inf={inf} />
+                    <div className="drow__main">
+                      <div className="drow__t">{inf.name}</div>
+                      <div className="drow__m">{["Thanks for reaching out — happy to hear more.", "Sounds good, sending the deck over now.", "Can we push the shoot to next week?"][i]}</div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+
             {/* Consent protection (dark) */}
             <div className="dpanel dpanel--dark">
               <div style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#B4FF6A" }}>

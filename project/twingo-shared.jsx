@@ -102,6 +102,32 @@ function useSubmissions(defaults) {
   return [list, update];
 }
 
+/* ---------- Shared brief applications (talent → business) ---------- */
+const APP_KEY = "twingo-applications";
+function getApplications() {
+  try { const v = JSON.parse(localStorage.getItem(APP_KEY)); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+}
+function setApplications(list) {
+  try { localStorage.setItem(APP_KEY, JSON.stringify(list)); } catch (e) {}
+  window.dispatchEvent(new CustomEvent("twingo-applications"));
+}
+function addApplication(app) {
+  const list = getApplications();
+  const next = [{ id: Date.now(), status: "pending", when: "Just now", ...app }, ...list];
+  setApplications(next);
+  return next;
+}
+function useApplications() {
+  const [list, setList] = React.useState(getApplications);
+  React.useEffect(() => {
+    const onChange = () => setList(getApplications());
+    window.addEventListener("twingo-applications", onChange);
+    window.addEventListener("storage", onChange);
+    return () => { window.removeEventListener("twingo-applications", onChange); window.removeEventListener("storage", onChange); };
+  }, []);
+  return list;
+}
+
 /* ---------- Twingo brand mark ---------- */
 /* Owner's mark: two overlapping rings ("twin" + loop) with a lime "go" dot,
    rendered in the ink + lime palette. */
@@ -512,6 +538,18 @@ const CONTENT_IMG = (seed) => "https://picsum.photos/seed/twingo-" + seed + "/60
 const NICHES = ["All", "Film", "Series / Micro-Series", "Edutainment", "Commercial", "Music Videos", "Animation", "Documentary", "Social Media / Reels", "Branded Content"];
 const PLATFORMS = ["All platforms", "Instagram", "TikTok", "YouTube"];
 
+/* ---------- Brief dataset (browse-briefs, brief-detail, messages talent-view contacts) ---------- */
+const BRIEFS = [
+  { id: "aurora",  company: "Aurora Skincare",  initial: "A", color: "var(--ink)",     title: "AI twin for SPF product launch commercial", niche: "Commercial",    platform: "Instagram", budget: "$800 – $1,500",   commit: "Fixed price", dur: "2 weeks",   posted: "2 days ago",  postedDate: "Jul 11, 2026", proposals: 6,  desc: "Product launch commercial for a new SPF line. Looking for a natural, everyday-use style with a warm, approachable read on camera." },
+  { id: "flux",    company: "Flux Games",       initial: "F", color: "#3A4150",        title: "Recurring NPC host for game trailers", niche: "Animation",    platform: "YouTube",   budget: "$1,200 – $2,000/mo", commit: "Ongoing",    dur: "Ongoing",   posted: "1 day ago",   postedDate: "Jul 12, 2026", proposals: 11, desc: "AI twin cast as a recurring NPC host across trailer and in-game cinematics. Multi-month engagement with option to extend." },
+  { id: "verde",   company: "Verde Foods",      initial: "V", color: "#D86447",        title: "Recipe series host, 12 short clips",   niche: "Social Media / Reels",      platform: "TikTok",    budget: "$500 – $900",     commit: "Fixed price", dur: "3 weeks",   posted: "5 days ago",  postedDate: "Jul 8, 2026",  proposals: 18, desc: "Series of quick recipe clips featuring a licensed AI twin as the on-camera host. Casual, upbeat tone." },
+  { id: "pulse",   company: "Pulse Fitness",    initial: "P", color: "var(--ink)",     title: "Workout demo ads, 3 languages",        niche: "Commercial",   platform: "Instagram", budget: "$1,000 – $1,800", commit: "Fixed price", dur: "3 weeks",   posted: "3 days ago",  postedDate: "Jul 10, 2026", proposals: 9,  desc: "Workout demo ads for a new app launch, localized across three languages. Energetic, motivational delivery." },
+  { id: "nomad",   company: "Nomad Airlines",   initial: "N", color: "#0D0A0A",        title: "Recurring traveler character, brand film series", niche: "Series / Micro-Series", platform: "YouTube", budget: "$2,000 – $3,500", commit: "Fixed price", dur: "5 episodes", posted: "6 hours ago", postedDate: "Jul 13, 2026", proposals: 3, desc: "Destination brand film series featuring a recurring AI-twin traveler character across five episodes." },
+  { id: "kitel",   company: "Kit Electronics",  initial: "K", color: "#3A4150",        title: "Unboxing & review-style content",      niche: "Branded Content",      platform: "YouTube",   budget: "$1,500 – $2,500", commit: "Fixed price", dur: "2 weeks",   posted: "4 days ago",  postedDate: "Jul 9, 2026",  proposals: 14, desc: "Unboxing and review-style content for a new product line, multiple variations for A/B testing." },
+  { id: "modiste", company: "Modiste",          initial: "M", color: "#B24A31",        title: "Lookbook stills + reels for capsule drop", niche: "Branded Content", platform: "Instagram", budget: "$900 – $1,600",  commit: "Fixed price", dur: "10 days",   posted: "1 week ago",  postedDate: "Jul 6, 2026",  proposals: 22, desc: "Lookbook stills and short reels for a capsule collection drop. Editorial, minimal styling." },
+  { id: "lumen",   company: "Lumen Learning",   initial: "L", color: "#12894B",        title: "Friendly host for explainer video series", niche: "Edutainment", platform: "TikTok", budget: "$600 – $1,100",  commit: "One-off",     dur: "1 week",    posted: "2 days ago",  postedDate: "Jul 11, 2026", proposals: 8, desc: "Friendly host for a series of short explainer videos aimed at young adults. Clear, warm delivery." },
+];
+
 /* ---------- Influencer card (browse / featured) ---------- */
 function InfluencerCard({ inf, href }) {
   const [h, setH] = React.useState(false);
@@ -699,6 +737,7 @@ Object.assign(window, {
   DS, getRole, setRole, useRole, getSignedIn, setSignedIn, useSignedIn, MOCK_USER,
   getAccountType, setAccountType, getTalentOnboarded, setTalentOnboarded,
   getSubmissions, setSubmissions, addSubmission, seedSubmissions, useSubmissions,
+  getApplications, setApplications, addApplication, useApplications,
   TwingoMark, SimpleHeader, ThemeToggle, RoleSwitcher, Footer, TrustRow, Portrait,
-  INFLUENCERS, NICHES, PLATFORMS, InfluencerCard, HandoffModal, MessageModal, AuthModal, CONTENT_IMG,
+  INFLUENCERS, NICHES, PLATFORMS, BRIEFS, InfluencerCard, HandoffModal, MessageModal, AuthModal, CONTENT_IMG,
 });
